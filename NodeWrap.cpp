@@ -1,8 +1,11 @@
 
+#include <string.h>
+
 #include "NodeWrap.h"
 #include "DomainWrap.h"
 
 #include "ArgsNodeDefine_domain_xml.h"
+
 
 NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_agent)
 {
@@ -75,8 +78,14 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
     mgmtObject = new Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
     agent->addObject(mgmtObject);
 
+    syncDomains();
 
-    /* Now we collect all the domains and stick them in the domain vector. */
+}
+
+void NodeWrap::syncDomains()
+{
+
+    /* Sync up with domains that are defined but not active. */
     int maxname = virConnectNumOfDefinedDomains(conn);
     if (maxname < 0) {
         printf("Error getting max domain count\n");
@@ -90,6 +99,19 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
         for (int i = 0; i < maxname; i++) {
             virDomainPtr domain_ptr;
+            
+            bool found = false;
+            for (std::vector<DomainWrap*>::iterator iter = domains.begin();
+                    iter != domains.end(); iter++) {
+                if ((*iter)->domain_name == names[i]) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                continue;
+            }
 
             domain_ptr = virDomainLookupByName(conn, names[i]);
             if (!domain_ptr) {
@@ -100,8 +122,10 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
                 domains.push_back(domain);
             }
         }
+        free(names);
     }
-    
+   
+    /* Go through all the active domains */ 
     int maxids = virConnectNumOfDomains(conn);
     if (maxids < 0) {
         printf("Error getting max domain id count\n");
@@ -115,15 +139,52 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
         for (int i = 0; i < maxids; i++) {
             virDomainPtr domain_ptr;
+            char dom_uuid[VIR_UUID_BUFLEN];
 
             domain_ptr = virDomainLookupByID(conn, ids[i]);
             if (!domain_ptr) {
                 printf("Unable to get domain ptr for domain name %s\n", ids[i]);
-            } else {
-                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-                printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
-                domains.push_back(domain);
+                continue;
             }
+            
+            if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
+                printf("1: Unable to get UUID string of domain\n");
+                continue;
+            }
+    
+            bool found = false;
+            for (std::vector<DomainWrap*>::iterator iter = domains.begin();
+                    iter != domains.end(); iter++) {
+                if (strcmp((*iter)->domain_uuid.c_str(), dom_uuid) == 0) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (found) {
+                virDomainFree(domain_ptr);
+                continue;
+            }
+            
+            DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
+            printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
+            domains.push_back(domain);
+        }
+        free(ids);
+    }
+
+    /* Go through our list of domains and ensure that they still exist. */
+    for (std::vector<DomainWrap*>::iterator iter = domains.begin(); iter != domains.end();) {
+
+        printf ("verifying domain %s\n", (*iter)->domain_name.c_str());
+        virDomainPtr ptr = virDomainLookupByUUIDString(conn, (*iter)->domain_uuid.c_str());
+        if (ptr == NULL) {
+            printf("Destroying domain %s\n", (*iter)->domain_name.c_str());
+            delete (*iter);
+            iter = domains.erase(iter);
+        } else {
+            virDomainFree(ptr);
+            iter++;
         }
     }
 }
@@ -133,6 +194,8 @@ void NodeWrap::doLoop()
     // Periodically bump a counter to provide a changing statistical value
     while (1) {
         Mutex::ScopedLock _lock(vectorLock);
+
+        syncDomains();
 
         for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                 iter != domains.end(); iter++) {

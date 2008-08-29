@@ -48,6 +48,7 @@ public:
     { return mgmtObject; }
 
     void doLoop();
+    void syncDomains();
 
     status_t ManagementMethod (uint32_t methodId, Args& args);
 };

@@ -32,9 +32,12 @@ class DomainWrap : public Manageable
     Mutex vectorLock;
 
     virConnectPtr conn;
-    virDomainPtr dom;
+    virDomainPtr domain_ptr;
 
 public:
+
+    std::string domain_name;
+    std::string domain_uuid;
 
     DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_ptr, 
                 virConnectPtr connect);
