@@ -18,18 +18,18 @@
 # 
 
 SRC_DIR     = .
-QPID_DIR    = ../src/qpid
+QPID_DIR    = /usr/local
 SCHEMA_FILE = $(SRC_DIR)/libvirt-schema.xml
 GEN_DIR     = $(SRC_DIR)/gen
 OUT_FILE    = $(SRC_DIR)/libvirt-amt
 
 CC           = gcc
-LIB_DIR      = $(QPID_DIR)/cpp/src/.libs
-CC_INCLUDES  = -I$(SRC_DIR) -I$(QPID_DIR)/cpp/src -I$(QPID_DIR)/cpp/src/gen -I$(GEN_DIR)
+LIB_DIR      = $(QPID_DIR)/lib
+CC_INCLUDES  = -I$(SRC_DIR) -I$(QPID_DIR)/include -I$(GEN_DIR)
 CC_FLAGS     = -g -O2
 LD_FLAGS     = -lqpidclient -lqpidcommon -lvirt -L$(LIB_DIR)
-SPEC_DIR     = $(QPID_DIR)/specs
-MGEN_DIR     = $(QPID_DIR)/cpp/managementgen
+SPEC_DIR     = $(MGEN_DIR)
+MGEN_DIR     = $(QPID_DIR)/share/managementgen
 TEMPLATE_DIR = $(MGEN_DIR)/templates
 MGEN         = $(MGEN_DIR)/main.py
 OBJ_DIR      = $(SRC_DIR)/.libs
