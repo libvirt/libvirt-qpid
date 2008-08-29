@@ -91,11 +91,13 @@ void NodeWrap::syncDomains()
         printf("Error getting max domain count\n");
         exit(1);
     } else {
-        char **names = (char **) malloc(sizeof(char *) * maxname);
+        //char **names = (char **) malloc(sizeof(char *) * maxname);
+        char *names[maxname];
         if ((maxname = virConnectListDefinedDomains(conn, names, maxname)) < 0) {
             printf("Error getting list of defined domains\n");
             exit(1);
         }
+
 
         for (int i = 0; i < maxname; i++) {
             virDomainPtr domain_ptr;
@@ -122,7 +124,6 @@ void NodeWrap::syncDomains()
                 domains.push_back(domain);
             }
         }
-        free(names);
     }
 
     /* Go through all the active domains */
@@ -131,7 +132,7 @@ void NodeWrap::syncDomains()
         printf("Error getting max domain id count\n");
         exit(1);
     } else {
-        int *ids = (int *) malloc(sizeof(int *) * maxids);
+        int ids[maxids];
         if ((maxids = virConnectListDomains(conn, ids, maxids)) < 0) {
             printf("Error getting list of defined domains\n");
             exit(1);
@@ -170,7 +171,6 @@ void NodeWrap::syncDomains()
             printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
             domains.push_back(domain);
         }
-        free(ids);
     }
 
     /* Go through our list of domains and ensure that they still exist. */
