@@ -1,0 +1,166 @@
+<schema package="Libvirt">
+
+  <!-- This is an object model of the libvirt API.
+       access: Access mode: RC = Read/Create, RO = read only, RW = read/write.
+       dir: Direction of argument: I = in, O = out, IO = in/out.
+  -->
+
+  <!-- In libvirt this is really the 'Connect' class, I may end up changing it.. -->
+
+  <class name="Node">
+    <property name="hostname" type="sstr" access="RC" desc="Host name"/>
+    <property name="uri" type="sstr" access="RC" desc="URI of libvirt"/>
+    <property name="libvirt_version" type="sstr" access="RC" desc="Version of libvirt on the managed node"/>
+    <property name="api_version" type="sstr" access="RC" desc="Version of libvirt API on the managed node"/>
+    <property name="hypervisor_version" type="sstr" access="RC" desc="Hypervisor Version"/>
+    <property name="hypervisor_type" type="sstr" access="RC" desc="Hypervisor type"/>
+    
+    <!-- Set up an association of the node with the host info class. -->
+    <!-- <property name="host_info" type="objId" reference="NodeInfo" 
+     desc="Host information and statistics gathered from qpid modeling agent."/> -->
+
+    <method name="define_domain_xml" desc="Define a new domain, but does not start it.">
+      <arg name="xml_desc" dir="I" type="sstr" desc="XML domain description"/>
+
+      <arg name="domain" dir="O" type="sstr" desc="Newly created domain object"/>
+    </method>
+   
+    <method name="storage_pool_define_xml" 
+     desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
+      <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
+      
+      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
+    </method>
+    
+    <method name="storage_pool_create_xml" 
+     desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
+      <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
+      
+      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
+    </method>
+  </class>
+
+  <!-- Mapped in from the 'Node' class. -->
+  <class name="NodeInfo">
+    <property name="model" type="sstr"/>
+    <property name="memory" type="uint64"/>
+    <property name="cpus" type="uint32"/>
+    <property name="mhz" type="uint32"/>
+    <property name="nodes" type="uint32"/>
+    <property name="sockets" type="uint32"/>
+    <property name="cores" type="uint32"/>
+    <property name="threads" type="uint32"/>
+  </class>
+
+  <class name="Domain">
+    <property name="uuid" access="RC" type="sstr" desc="Domain UUID"/>
+    <property name="name" access="RC" type="sstr" desc="Domain name"/>
+    <!-- FIXME: Should be int64 but it's broken atm -->
+    <property name="id" type="uint64" desc="Hypervisor Domain id, -1 if not running."/>
+    
+    <!-- Set up an association of hosts to VMs.  This will setup a domain list in the node object
+         and give us a reference here to the node object. -->
+    <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this VM"/>
+    
+    <statistic name="maximum_memory" type="uint64" desc="Maximum memory allowed in KB."/>
+    <statistic name="memory" type="uint64" desc="Memory used in KB."/>
+    <statistic name="cpu_time" type="uint64" desc="CPU time used in nanoseconds."/>
+    <property name="state" type="sstr" desc="Domain state."/>
+    <property name="num_vcpus" type="uint32" desc="Number of virtual CPUs."/>
+
+    <method name="create" desc="Start stopped VM"/>
+    
+    <method name="destroy" desc="Stop this VM"/>
+    
+    <method name="undefine" desc="Undefine the domain"/>
+    
+    <method name="suspend" desc="Suspend this VM"/>
+
+    <method name="resume" desc="Resume suspended VM"/>
+
+    <method name="save" desc="Save this VM">
+      <arg name="filename" type="sstr" desc="Name of file to save VM image in"/>
+    </method>
+    
+    <method name="restore" desc="Restore saved VM">
+      <arg name="filename" type="sstr" desc="Name of file to restore from"/>
+    </method>
+    
+    <method name="shutdown" desc="Shutdown a VM"/>
+
+    <method name="reboot" desc="Reboot VM"/>
+    
+    <method name="xml_desc" desc="Return an XML description of the domain.">
+      <arg name="description" dir="O" type="sstr" desc="XML description of the domain."/>
+    </method>
+    
+    
+    <method name="migrate" desc="Migrate this VM to another host">
+      <arg name="destination_node" dir="I" type="objId" desc="Object representing destination host."/>
+      <arg name="flags" dir="I" type="uint32" desc="Flags for migration, see documentation for details."/>
+      <arg name="new_domain_name" dir="I" type="sstr" desc="New domain name on new host if applicable."/>
+      <arg name="uri" dir="I" type="sstr" desc="Destination hostname/URI as seen from host."/>
+      <arg name="bandwidth" dir="I" type="uint32" desc="Maximum bandwidth to consume in Mbps."/>
+      
+      <arg name="domain" dir="O" type="objId" desc="New VM object on new host"/>
+    </method>
+  </class>
+
+  <class name="Pool">
+    <property name="uuid" type="sstr" desc="Pool UUID"/>
+    <property name="name" type="sstr" desc="Pool host"/>
+    
+    <!-- Set up an association of hosts to storage pools.  This will setup a list of pools in the node object
+         and give us a reference here to the node. -->
+    <property name="node" type="objId" references="Node" desc="Node of this storage pool"/>
+    
+    <method name="xml_desc" desc="Return an XML description of the storage pool.">
+      <arg name="description" dir="O" type="sstr" desc="XML description of the storage pool."/>
+    </method>
+    
+    <method name="create" desc="Starts an inactive storage pool.">
+    </method>
+    
+    <method name="destroy" desc="Destroy an active storage pool. This will deactivate the pool on the host, but keep any persistent config associated with it. If it has a persistent config it can later be restarted with a create() call">
+    </method>
+
+    <method name="delete" desc="Destroy the pool and delete its definition">
+    </method>
+    
+    <method name="create_volume_xml" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
+
+      <arg name="xml_desc" type="sstr" desc="XML Description of the volume to create"/>
+      
+      <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
+    </method>
+    
+    <method name="lookup_volume_by_name" desc="Look up a storage volume by name.">
+      <arg name="volume_name" dir="I" type="sstr" desc="Volume name."/>
+      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
+    </method>
+
+    <method name="lookup_volume_by_key" desc="Look up a storage volume by key.">
+      <arg name="volume_key" dir="I" type="sstr" desc="Volume key."/>
+      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
+    </method>
+
+    <method name="lookup_volume_by_path" desc="Look up a storage volume by path.">
+      <arg name="volume_path" dir="I" type="sstr" desc="Volume path."/>
+      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
+    </method>
+  </class>
+ 
+  <class name="Volume">
+    <property name="key" type="sstr" desc="Storage volume key"/>
+    <property name="path" type="sstr" desc="Storage volume path"/>
+    <property name="name" type="sstr" desc="Storage volume name"/>
+
+    <property name="storage_pool" type="objId" references="Pool" desc="Pool where this storage volume exists"/>
+
+    <method name="xml_desc" desc="Return an XML description of the volume.">
+      <arg name="description" dir="O" type="sstr" desc="XML description of the volume."/>
+    </method>
+  </class>
+
+</schema>
+
