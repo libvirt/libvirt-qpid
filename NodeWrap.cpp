@@ -91,8 +91,8 @@ void NodeWrap::syncDomains()
         printf("Error getting max domain count\n");
         exit(1);
     } else {
-        //char **names = (char **) malloc(sizeof(char *) * maxname);
         char *names[maxname];
+
         if ((maxname = virConnectListDefinedDomains(conn, names, maxname)) < 0) {
             printf("Error getting list of defined domains\n");
             exit(1);
@@ -133,6 +133,7 @@ void NodeWrap::syncDomains()
         exit(1);
     } else {
         int ids[maxids];
+
         if ((maxids = virConnectListDomains(conn, ids, maxids)) < 0) {
             printf("Error getting list of defined domains\n");
             exit(1);
