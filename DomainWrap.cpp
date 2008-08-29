@@ -38,7 +38,6 @@ DomainWrap::~DomainWrap()
 {
     domain->resourceDestroy();
     virDomainFree(domain_ptr);
-    virConnectFree(conn);
 }
 
 

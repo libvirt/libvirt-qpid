@@ -19,11 +19,11 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
     unsigned long libvirt_v;
     unsigned long hv_v;
     int ret;
-    unsigned int major; 
+    unsigned int major;
     unsigned int minor;
     unsigned int rel;
 
-    conn = virConnectOpen(NULL);    
+    conn = virConnectOpen(NULL);
     if (!conn) {
         printf ("Error connecting!\n");
         exit(1);
@@ -40,7 +40,7 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         printf ("Failed to get HV type\n");
         exit(1);
     }
-    
+
     uri = virConnectGetURI(conn);
     if (uri == NULL) {
         printf ("Failed to get uri\n");
@@ -56,7 +56,7 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         minor = libvirt_v / 1000;
         rel = libvirt_v % 1000;
         snprintf(libvirt_version, sizeof(libvirt_version), "%d.%d.%d", major, minor, rel);
-        
+
         major = api_v / 1000000;
         api_v %= 1000000;
         minor = api_v / 1000;
@@ -99,7 +99,7 @@ void NodeWrap::syncDomains()
 
         for (int i = 0; i < maxname; i++) {
             virDomainPtr domain_ptr;
-            
+
             bool found = false;
             for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                     iter != domains.end(); iter++) {
@@ -124,8 +124,8 @@ void NodeWrap::syncDomains()
         }
         free(names);
     }
-   
-    /* Go through all the active domains */ 
+
+    /* Go through all the active domains */
     int maxids = virConnectNumOfDomains(conn);
     if (maxids < 0) {
         printf("Error getting max domain id count\n");
@@ -146,12 +146,12 @@ void NodeWrap::syncDomains()
                 printf("Unable to get domain ptr for domain name %s\n", ids[i]);
                 continue;
             }
-            
+
             if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
                 printf("1: Unable to get UUID string of domain\n");
                 continue;
             }
-    
+
             bool found = false;
             for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                     iter != domains.end(); iter++) {
@@ -160,12 +160,12 @@ void NodeWrap::syncDomains()
                     break;
                 }
             }
-            
+
             if (found) {
                 virDomainFree(domain_ptr);
                 continue;
             }
-            
+
             DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
             printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
             domains.push_back(domain);
@@ -191,10 +191,12 @@ void NodeWrap::syncDomains()
 
 void NodeWrap::doLoop()
 {
-    // Periodically bump a counter to provide a changing statistical value
+    /* Go through all domains and call update() for each, letting them update
+     * information and statistics. */
     while (1) {
         Mutex::ScopedLock _lock(vectorLock);
 
+        agent->pollCallbacks();
         syncDomains();
 
         for (std::vector<DomainWrap*>::iterator iter = domains.begin();
@@ -202,11 +204,11 @@ void NodeWrap::doLoop()
             (*iter)->update();
         }
 
-        sleep(5);
+        sleep(15);
     }
 }
 
-Manageable::status_t 
+Manageable::status_t
 NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
 {
     virDomainPtr domain_ptr;
@@ -254,8 +256,11 @@ int main(int argc, char** argv) {
     PackageLibvirt packageInit(agent);
 
     // Start the agent.  It will attempt to make a connection to the
-    // management broker
-    agent->init (string(host), port);
+    // management broker.  The third argument is the interval for sending
+    // updates to stats/properties to the broker.  The last is set to 'true'
+    // to keep this all single threaded.  Otherwise a second thread would be
+    // used to implement methods.
+    agent->init(string(host), port, 5, true);
 
     NodeWrap node(agent, "Libvirt Node");
 
