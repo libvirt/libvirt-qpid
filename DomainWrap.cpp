@@ -34,6 +34,14 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
     domain_ptr = domain_pointer;
 }
 
+DomainWrap::~DomainWrap()
+{
+    domain->resourceDestroy();
+    virDomainFree(domain_ptr);
+    virConnectFree(conn);
+}
+
+
 void
 DomainWrap::update()
 {

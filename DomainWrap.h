@@ -26,7 +26,6 @@ using qpid::sys::Mutex;
 
 class DomainWrap : public Manageable
 {
-    string name;
     ManagementAgent *agent;
     Domain *domain;
     Mutex vectorLock;
@@ -41,16 +40,12 @@ public:
 
     DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_ptr, 
                 virConnectPtr connect);
-    ~DomainWrap() 
-    { 
-        domain->resourceDestroy(); 
-    }
-    
+    ~DomainWrap();
+
     ManagementObject* GetManagementObject(void) const
     { 
         return domain; 
     }
-
 
     void update();
 
