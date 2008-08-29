@@ -225,10 +225,15 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
                 return STATUS_INVALID_PARAMETER;
             } else {
 
+                qpid::framing::Buffer buffer;
+
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 printf("Created new domain.\n");
 
-                io_args->o_domain = domain->GetManagementObject()->getObjectId();
+                domain->GetManagementObject()->getObjectId().encode(buffer);
+                // FIXME: 256??
+                buffer.getRawData(io_args->o_domain, 256);
+
                 return STATUS_OK;
             }
         }
