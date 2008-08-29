@@ -15,10 +15,6 @@
     <property name="hypervisor_version" type="sstr" access="RC" desc="Hypervisor Version"/>
     <property name="hypervisor_type" type="sstr" access="RC" desc="Hypervisor type"/>
     
-    <!-- Set up an association of the node with the host info class. -->
-    <!-- <property name="host_info" type="objId" reference="NodeInfo" 
-     desc="Host information and statistics gathered from qpid modeling agent."/> -->
-
     <method name="define_domain_xml" desc="Define a new domain, but does not start it.">
       <arg name="xml_desc" dir="I" type="sstr" desc="XML domain description"/>
 

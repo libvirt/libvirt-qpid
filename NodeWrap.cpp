@@ -2,6 +2,8 @@
 #include "NodeWrap.h"
 #include "DomainWrap.h"
 
+#include "ArgsNodeDefine_domain_xml.h"
+
 NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_agent)
 {
     char *hostname;
@@ -87,20 +89,15 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         }
 
         for (int i = 0; i < maxname; i++) {
-            char dom_uuid[VIR_UUID_BUFLEN];
             virDomainPtr domain_ptr;
 
             domain_ptr = virDomainLookupByName(conn, names[i]);
             if (!domain_ptr) {
                 printf ("Unable to get domain ptr for domain name %s\n", names[i]);
             } else {
-
-                if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
-                } else {
-                    DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn, dom_uuid, names[i]);
-                    printf("Created new domain: %s, ptr is %p\n", names[i], domain_ptr);
-                    domains.push_back(domain);
-                }
+                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
+                printf("Created new domain: %s, ptr is %p\n", names[i], domain_ptr);
+                domains.push_back(domain);
             }
         }
     }
@@ -117,26 +114,15 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         }
 
         for (int i = 0; i < maxids; i++) {
-            char dom_uuid[VIR_UUID_BUFLEN];
             virDomainPtr domain_ptr;
 
             domain_ptr = virDomainLookupByID(conn, ids[i]);
             if (!domain_ptr) {
                 printf("Unable to get domain ptr for domain name %s\n", ids[i]);
             } else {
-
-                if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
-                    printf("Unable to get UUID string of domain\n");
-                } else {
-                    const char *dom_name = virDomainGetName(domain_ptr);
-                    if (!dom_name) {
-                        printf ("Unable to get domain name!\n");
-                    } else {
-                        DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn, dom_uuid, dom_name);
-                        printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
-                        domains.push_back(domain);
-                    }
-                }
+                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
+                printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
+                domains.push_back(domain);
             }
         }
     }
@@ -153,23 +139,37 @@ void NodeWrap::doLoop()
             (*iter)->update();
         }
 
-        sleep(10);
+        sleep(5);
     }
 }
 
 Manageable::status_t 
 NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
 {
+    virDomainPtr domain_ptr;
     Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {
-    /* case Node::METHOD_GET_FREE_MEMORY:
-        ArgsNodeGet_free_memory *ioArgs = (ArgsNodeGet_free_memory *) &args;
-        
-	ioArgs->o_result = 1234;
+        case Node::METHOD_DEFINE_DOMAIN_XML:
+        {
+            ArgsNodeDefine_domain_xml *io_args = (ArgsNodeDefine_domain_xml *) &args;
+            domain_ptr = virDomainDefineXML(conn, io_args->i_xml_desc.c_str());
+            if (!domain_ptr) {
+                printf("Error creating new domain from XML\n");
+                return STATUS_INVALID_PARAMETER;
+            } else {
 
-        return STATUS_OK; */
+                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
+                printf("Created new domain.\n");
+
+                io_args->o_domain = domain->GetManagementObject()->getObjectId();
+                return STATUS_OK;
+            }
+        }
+
+        //case Node::METHOD_STORAGE_POOL_DEFINE_XML:
+        //case Node::METHOD_STORAGE_POOL_CREATE_XML:
     }
 
     return STATUS_NOT_IMPLEMENTED;
@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
     // management broker
     agent->init (string(host), port);
 
-    NodeWrap node(agent, "Test connect class");
+    NodeWrap node(agent, "Libvirt Node");
 
     node.doLoop();
 }

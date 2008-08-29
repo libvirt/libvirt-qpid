@@ -18,7 +18,7 @@
 # 
 
 SRC_DIR     = .
-QPID_DIR    = ../../..
+QPID_DIR    = ../src/qpid
 SCHEMA_FILE = $(SRC_DIR)/libvirt-schema.xml
 GEN_DIR     = $(SRC_DIR)/gen
 OUT_FILE    = $(SRC_DIR)/libvirt-amt

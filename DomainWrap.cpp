@@ -8,9 +8,24 @@
 #include "ArgsDomainXml_desc.h"
 
 DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_ptr, 
-                         virConnectPtr connect, std::string uuid, std::string name)
+                         virConnectPtr connect)
 {
-    domain = new Domain(agent, this, parent, uuid, name);
+    char dom_uuid[VIR_UUID_BUFLEN];
+    const char *dom_name;
+    
+    if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
+        printf("Unable to get UUID string of domain\n");
+        // FIXME: Not sure how to handle this one..
+        return;
+    }
+    
+    dom_name = virDomainGetName(domain_ptr);
+    if (!dom_name) {
+        printf ("Unable to get domain name!\n");
+        return;
+    }
+    
+    domain = new Domain(agent, this, parent, dom_uuid, dom_name);
     agent->addObject(domain);
     conn = connect;
     dom = domain_ptr;

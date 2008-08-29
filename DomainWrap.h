@@ -37,7 +37,7 @@ class DomainWrap : public Manageable
 public:
 
     DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_ptr, 
-                virConnectPtr connect, std::string uuid, std::string name);
+                virConnectPtr connect);
     ~DomainWrap() 
     { 
         domain->resourceDestroy(); 
@@ -47,6 +47,7 @@ public:
     { 
         return domain; 
     }
+
 
     void update();
 
