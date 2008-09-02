@@ -88,6 +88,13 @@ DomainWrap::update()
     ret = virDomainGetID(domain_ptr);
     // Just set it directly, if there's an error, -1 will be right.
     domain->set_id(ret);
+   
+    if (ret > 0) {
+        domain->set_active("true");
+    } else {
+        domain->set_active("false");
+    }
+    domain->set_id(ret);
 }
 
 Manageable::status_t
