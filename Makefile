@@ -21,7 +21,7 @@ SRC_DIR     = .
 QPID_DIR    = /usr/local
 SCHEMA_FILE = $(SRC_DIR)/libvirt-schema.xml
 GEN_DIR     = $(SRC_DIR)/gen
-OUT_FILE    = $(SRC_DIR)/libvirt-amt
+OUT_FILE    = $(SRC_DIR)/libvirt-qpid
 
 CC           = gcc
 LIB_DIR      = $(QPID_DIR)/lib
