@@ -1,5 +1,7 @@
 
 #include <string.h>
+#include <sys/select.h>
+#include <errno.h>
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
@@ -192,20 +194,45 @@ void NodeWrap::syncDomains()
 
 void NodeWrap::doLoop()
 {
+    fd_set fds;
+    struct timeval tv;
+    int retval;
+        
     /* Go through all domains and call update() for each, letting them update
      * information and statistics. */
     while (1) {
         Mutex::ScopedLock _lock(vectorLock);
+        int read_fd = agent->getSignalFd();
+        printf ("read ifd is %d\n", read_fd);
 
-        agent->pollCallbacks();
+        /* Poll agent fd.  If any methods are being made this FD will be ready for reading.  */
+        FD_ZERO(&fds);
+        FD_SET(read_fd, &fds);
+
+        /* Wait up to five seconds. */
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+
+        retval = select(read_fd + 1, &fds, NULL, NULL, &tv);
+        if (retval < 0) {
+            printf ("Error in select loop: %s\n", strerror(errno));
+            continue;
+        }
+
+        if (retval > 0) {
+            /* This implements any pending methods. */
+            agent->pollCallbacks();
+        }
+
+        // FIXME: This could be a little smarter.. as it is it fires everytime a 
+        // method is called.  This may be a good thing or it may need to be setup
+        // so it only runs every 5 seconds or such.
         syncDomains();
 
         for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                 iter != domains.end(); iter++) {
             (*iter)->update();
         }
-
-        sleep(15);
     }
 }
 
@@ -229,7 +256,6 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
                 qpid::framing::Buffer buffer;
 
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-                printf("Created new domain.\n");
 
                 domain->GetManagementObject()->getObjectId().encode(buffer);
                 // FIXME: 256??

@@ -63,6 +63,7 @@
     <statistic name="cpu_time" type="uint64" desc="CPU time used in nanoseconds."/>
     <property name="state" type="sstr" desc="Domain state."/>
     <property name="num_vcpus" type="uint32" desc="Number of virtual CPUs."/>
+    <property name="active" type="sstr" desc="true/false domain active."/>
 
     <method name="create" desc="Start stopped VM"/>
     
