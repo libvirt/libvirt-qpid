@@ -47,6 +47,8 @@ public:
         return pool;
     }
 
+    void update();
+
     status_t ManagementMethod (uint32_t methodId, Args& args);
 };
 

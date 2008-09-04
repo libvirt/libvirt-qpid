@@ -137,7 +137,7 @@
     <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
     <property name="name" type="sstr" access="RC" desc="Storage volume name"/>
 
-    <property name="storage_ool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
+    <property name="storage_pool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
      desc="Pool where this storage volume exists"/>
 
     <method name="xml_desc" desc="Return an XML description of the volume.">

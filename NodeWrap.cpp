@@ -317,9 +317,14 @@ void NodeWrap::doLoop()
         // method is called.  This may be a good thing or it may need to be setup
         // so it only runs every 5 seconds or such.
         syncDomains();
+        syncPools();
 
         for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                 iter != domains.end(); iter++) {
+            (*iter)->update();
+        }
+        for (std::vector<PoolWrap*>::iterator iter = pools.begin();
+                iter != pools.end(); iter++) {
             (*iter)->update();
         }
     }

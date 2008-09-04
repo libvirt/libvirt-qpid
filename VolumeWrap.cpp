@@ -6,6 +6,7 @@
 #include "PoolWrap.h"
 #include "VolumeWrap.h"
 
+#include "ArgsVolumeXml_desc.h"
 
 VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent, 
                        virStorageVolPtr volume_pointer, virConnectPtr connect)
@@ -67,6 +68,19 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args)
     int ret;
 
     switch (methodId) {
+        case Volume::METHOD_XML_DESC:
+        {
+            ArgsVolumeXml_desc *io_args = (ArgsVolumeXml_desc *) &args;
+            char *desc;
+
+            desc = virStorageVolGetXMLDesc(volume_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
+            if (desc) {
+                io_args->o_description = desc;
+            } else {
+                return STATUS_INVALID_PARAMETER;
+            }
+            return STATUS_OK;
+        }
     }
 
     return STATUS_NOT_IMPLEMENTED;

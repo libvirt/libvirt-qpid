@@ -53,6 +53,12 @@ PoolWrap::~PoolWrap()
     virStoragePoolFree(pool_ptr);
 }
 
+void
+PoolWrap::update()
+{
+
+}
+
 Manageable::status_t
 PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
 {
