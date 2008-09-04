@@ -195,6 +195,92 @@ void NodeWrap::syncDomains()
     }
 }
 
+void NodeWrap::checkPool(char *pool_name)
+{
+    virStoragePoolPtr pool_ptr;
+
+    bool found = false;
+    for (std::vector<PoolWrap*>::iterator iter = pools.begin();
+            iter != pools.end(); iter++) {
+        if ((*iter)->pool_name == pool_name) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        return;
+    }
+
+    pool_ptr = virStoragePoolLookupByName(conn, pool_name);
+    if (!pool_ptr) {
+        printf ("Unable to get pool ptr for pool name %s\n", pool_name);
+    } else {
+        PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
+        printf("Created new pool: %s, ptr is %p\n", pool_name, pool_ptr);
+        pools.push_back(pool);
+    }
+}
+
+void NodeWrap::syncPools()
+{
+    int maxname;
+    int maxinactive;
+    char **names;
+
+    maxname = virConnectNumOfStoragePools(conn);
+    if (maxname < 0) {
+        printf ("Error getting number of storage pools\n");
+        return;
+    } else {
+        char *names[maxname];
+
+        if ((maxname = virConnectListStoragePools(conn, names, maxname)) < 0) {
+            printf("Error getting list of defined domains\n");
+            exit(1);
+        }
+
+
+        for (int i = 0; i < maxname; i++) {
+            checkPool(names[i]);
+        }
+    }
+
+    maxname = virConnectNumOfDefinedStoragePools(conn);
+    if (maxname < 0) {
+        printf("Error getting max inactive pool count\n");
+        exit(1);
+    } else {
+        char *names[maxname];
+
+        if ((maxname = virConnectListDefinedStoragePools(conn, names, maxname)) < 0) {
+            printf("Error getting list of inactive storage pools\n");
+            exit(1);
+        }
+
+        for (int i = 0; i < maxname; i++) {
+            checkPool(names[i]);
+        }
+    }
+
+    /* Go through our list of pools and ensure that they still exist. */
+    for (std::vector<PoolWrap*>::iterator iter = pools.begin(); iter != pools.end();) {
+
+        printf ("Verifying pool %s\n", (*iter)->pool_name.c_str());
+        virStoragePoolPtr ptr = virStoragePoolLookupByUUIDString(conn, (*iter)->pool_uuid.c_str());
+        if (ptr == NULL) {
+            printf("Destroying pool %s\n", (*iter)->pool_name.c_str());
+            delete (*iter);
+            iter = pools.erase(iter);
+        } else {
+            virStoragePoolFree(ptr);
+            iter++;
+        }
+    }
+
+}
+
+
 void NodeWrap::doLoop()
 {
     fd_set fds;

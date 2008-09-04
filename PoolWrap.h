@@ -30,6 +30,7 @@ class PoolWrap : public Manageable
     Pool *pool;
     Mutex vectorLock;
 
+
     virConnectPtr conn;
     virStoragePoolPtr pool_ptr;
 
@@ -37,6 +38,9 @@ public:
 
     PoolWrap(ManagementAgent *agent, NodeWrap *parent, virStoragePoolPtr pool_ptr, virConnectPtr connect);
     ~PoolWrap();
+
+    std::string pool_name;
+    std::string pool_uuid;
 
     ManagementObject* GetManagementObject(void) const
     {

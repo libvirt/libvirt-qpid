@@ -11,16 +11,22 @@ PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
                    virStoragePoolPtr pool_pointer, virConnectPtr connect)
 {
     int ret;
-    char pool_uuid[VIR_UUID_STRING_BUFLEN];
-    const char *pool_name;
+    char pool_uuid_str[VIR_UUID_STRING_BUFLEN];
+    const char *pool_name_str;
 
-    ret = virStoragePoolGetUUIDString(pool_ptr, pool_uuid);
+    ret = virStoragePoolGetUUIDString(pool_ptr, pool_uuid_str);
     if (ret < 0) {
         printf("PoolWrap: Unable to get UUID\n");
         return;
     }
 
-    pool_name = virStoragePoolGetName(pool_ptr);
+    pool_name_str = virStoragePoolGetName(pool_ptr);
+    if (pool_name_str == NULL) {
+        printf ("PoolWrap: error getting pool name\n");
+    }
+
+    pool_name = pool_name_str;
+    pool_uuid = pool_uuid_str;
 
     pool = new Pool(agent, this, parent, pool_uuid, pool_name);
     agent->addObject(pool);
@@ -103,9 +109,9 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
             virStorageVolPtr volume_ptr;
 
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xml_desc.c_str(), 0);
-                
+
             VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);
-            
+
             volume->GetManagementObject()->getObjectId().encode(buffer);
             // FIXME: 256??
             buffer.getRawData(io_args->o_volume, 256);

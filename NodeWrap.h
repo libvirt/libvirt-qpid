@@ -7,6 +7,7 @@
 #include "PackageLibvirt.h"
 #include "Node.h"
 #include "Domain.h"
+#include "Pool.h"
 
 #include <unistd.h>
 #include <cstdlib>
@@ -28,6 +29,7 @@ using qpid::sys::Mutex;
 
 // Forward decl of DomainWrap to get around cyclic reference.
 class DomainWrap;
+class PoolWrap;
 
 class NodeWrap : public Manageable
 {
@@ -36,6 +38,7 @@ class NodeWrap : public Manageable
     Node *mgmtObject;
     Mutex vectorLock;
     std::vector<DomainWrap*> domains;
+    std::vector<PoolWrap*> pools;
 
     virConnectPtr conn;
 
@@ -43,12 +46,14 @@ public:
 
     NodeWrap(ManagementAgent* agent, string _name);
     ~NodeWrap() { mgmtObject->resourceDestroy(); }
-    
+
     ManagementObject* GetManagementObject(void) const
     { return mgmtObject; }
 
     void doLoop();
     void syncDomains();
+    void checkPool(char *pool_name);
+    void syncPools();
 
     status_t ManagementMethod (uint32_t methodId, Args& args);
 };
