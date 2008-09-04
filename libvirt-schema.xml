@@ -25,14 +25,14 @@
      desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
       <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
       
-      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
+      <arg name="pool" dir="O" type="sstr" desc="Newly created storage pool"/>
     </method>
     
     <method name="storage_pool_create_xml" 
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
       <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
       
-      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
+      <arg name="pool" dir="O" type="sstr" desc="Newly created storage pool"/>
     </method>
   </class>
 
@@ -104,12 +104,12 @@
   </class>
 
   <class name="Pool">
-    <property name="uuid" type="sstr" desc="Pool UUID"/>
-    <property name="name" type="sstr" desc="Pool host"/>
+    <property name="uuid" access="RC" type="sstr" desc="Pool UUID"/>
+    <property name="name" access="RC" type="sstr" desc="Pool name"/>
     
     <!-- Set up an association of hosts to storage pools.  This will setup a list of pools in the node object
          and give us a reference here to the node. -->
-    <property name="node" type="objId" references="Node" desc="Node of this storage pool"/>
+    <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>
     
     <method name="xml_desc" desc="Return an XML description of the storage pool.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the storage pool."/>
@@ -128,31 +128,17 @@
 
       <arg name="xml_desc" type="sstr" desc="XML Description of the volume to create"/>
       
-      <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
-    </method>
-    
-    <method name="lookup_volume_by_name" desc="Look up a storage volume by name.">
-      <arg name="volume_name" dir="I" type="sstr" desc="Volume name."/>
-      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
-    </method>
-
-    <method name="lookup_volume_by_key" desc="Look up a storage volume by key.">
-      <arg name="volume_key" dir="I" type="sstr" desc="Volume key."/>
-      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
-    </method>
-
-    <method name="lookup_volume_by_path" desc="Look up a storage volume by path.">
-      <arg name="volume_path" dir="I" type="sstr" desc="Volume path."/>
-      <arg name="volume" dir="O" type="objId" desc="Volume if found."/>
+      <arg name="volume" dir="O" type="sstr" desc="Newly created volume"/>
     </method>
   </class>
  
   <class name="Volume">
-    <property name="key" type="sstr" desc="Storage volume key"/>
-    <property name="path" type="sstr" desc="Storage volume path"/>
-    <property name="name" type="sstr" desc="Storage volume name"/>
+    <property name="key" type="sstr" access="RC" desc="Storage volume key"/>
+    <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
+    <property name="name" type="sstr" access="RC" desc="Storage volume name"/>
 
-    <property name="storage_pool" type="objId" references="Pool" desc="Pool where this storage volume exists"/>
+    <property name="storage_ool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
+     desc="Pool where this storage volume exists"/>
 
     <method name="xml_desc" desc="Return an XML description of the volume.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the volume."/>

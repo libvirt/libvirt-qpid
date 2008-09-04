@@ -5,8 +5,11 @@
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
+#include "PoolWrap.h"
 
 #include "ArgsNodeDefine_domain_xml.h"
+#include "ArgsNodeStorage_pool_create_xml.h"
+#include "ArgsNodeStorage_pool_define_xml.h"
 
 
 NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_agent)
@@ -197,7 +200,7 @@ void NodeWrap::doLoop()
     fd_set fds;
     struct timeval tv;
     int retval;
-        
+
     /* Go through all domains and call update() for each, letting them update
      * information and statistics. */
     while (1) {
@@ -224,7 +227,7 @@ void NodeWrap::doLoop()
             agent->pollCallbacks();
         }
 
-        // FIXME: This could be a little smarter.. as it is it fires everytime a 
+        // FIXME: This could be a little smarter.. as it is it fires everytime a
         // method is called.  This may be a good thing or it may need to be setup
         // so it only runs every 5 seconds or such.
         syncDomains();
@@ -252,7 +255,6 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
                 printf("Error creating new domain from XML\n");
                 return STATUS_INVALID_PARAMETER;
             } else {
-
                 qpid::framing::Buffer buffer;
 
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
@@ -265,8 +267,37 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
             }
         }
 
-        //case Node::METHOD_STORAGE_POOL_DEFINE_XML:
-        //case Node::METHOD_STORAGE_POOL_CREATE_XML:
+        case Node::METHOD_STORAGE_POOL_DEFINE_XML:
+        {
+            qpid::framing::Buffer buffer;
+
+            ArgsNodeStorage_pool_define_xml *io_args = (ArgsNodeStorage_pool_define_xml *) &args;
+            virStoragePoolPtr pool_ptr;
+
+            pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xml_desc.c_str(), 0);
+
+            PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
+
+            pool->GetManagementObject()->getObjectId().encode(buffer);
+            // FIXME: 256??
+            buffer.getRawData(io_args->o_pool, 256);
+
+        }
+        case Node::METHOD_STORAGE_POOL_CREATE_XML:
+        {
+            qpid::framing::Buffer buffer;
+
+            ArgsNodeStorage_pool_create_xml *io_args = (ArgsNodeStorage_pool_create_xml *) &args;
+            virStoragePoolPtr pool_ptr;
+
+            pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xml_desc.c_str(), 0);
+
+            PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
+
+            pool->GetManagementObject()->getObjectId().encode(buffer);
+            // FIXME: 256??
+            buffer.getRawData(io_args->o_pool, 256);
+        }
     }
 
     return STATUS_NOT_IMPLEMENTED;

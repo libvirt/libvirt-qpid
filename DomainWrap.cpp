@@ -10,7 +10,7 @@
 DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_pointer,
                          virConnectPtr connect)
 {
-    char dom_uuid[VIR_UUID_BUFLEN];
+    char dom_uuid[VIR_UUID_STRING_BUFLEN];
 
     if (virDomainGetUUIDString(domain_pointer, dom_uuid) < 0) {
         printf("DomainWrap: Unable to get UUID string of domain\n");
@@ -88,7 +88,7 @@ DomainWrap::update()
     ret = virDomainGetID(domain_ptr);
     // Just set it directly, if there's an error, -1 will be right.
     domain->set_id(ret);
-   
+
     if (ret > 0) {
         domain->set_active("true");
     } else {
