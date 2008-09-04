@@ -18,21 +18,21 @@
     <method name="define_domain_xml" desc="Define a new domain, but does not start it.">
       <arg name="xml_desc" dir="I" type="sstr" desc="XML domain description"/>
 
-      <arg name="domain" dir="O" type="sstr" desc="Newly created domain object"/>
+      <arg name="domain" dir="O" type="objId" desc="Newly created domain object"/>
     </method>
    
     <method name="storage_pool_define_xml" 
      desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
       <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
       
-      <arg name="pool" dir="O" type="sstr" desc="Newly created storage pool"/>
+      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
     
     <method name="storage_pool_create_xml" 
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
       <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
       
-      <arg name="pool" dir="O" type="sstr" desc="Newly created storage pool"/>
+      <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
   </class>
 
@@ -128,7 +128,7 @@
 
       <arg name="xml_desc" type="sstr" desc="XML Description of the volume to create"/>
       
-      <arg name="volume" dir="O" type="sstr" desc="Newly created volume"/>
+      <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
     </method>
   </class>
  

@@ -349,11 +349,7 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
                 qpid::framing::Buffer buffer;
 
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-
-                domain->GetManagementObject()->getObjectId().encode(buffer);
-                // FIXME: 256??
-                buffer.getRawData(io_args->o_domain, 256);
-
+                io_args->o_domain = domain->GetManagementObject()->getObjectId();
                 return STATUS_OK;
             }
         }
@@ -369,9 +365,8 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
 
-            pool->GetManagementObject()->getObjectId().encode(buffer);
-            // FIXME: 256??
-            buffer.getRawData(io_args->o_pool, 256);
+            io_args->o_pool = pool->GetManagementObject()->getObjectId();
+            return STATUS_OK;
 
         }
         case Node::METHOD_STORAGE_POOL_CREATE_XML:
@@ -384,10 +379,9 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
             pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xml_desc.c_str(), 0);
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
+            io_args->o_pool = pool->GetManagementObject()->getObjectId();
 
-            pool->GetManagementObject()->getObjectId().encode(buffer);
-            // FIXME: 256??
-            buffer.getRawData(io_args->o_pool, 256);
+            return STATUS_OK;
         }
     }
 

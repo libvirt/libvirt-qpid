@@ -117,10 +117,9 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xml_desc.c_str(), 0);
 
             VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);
+            io_args->o_volume = volume->GetManagementObject()->getObjectId();
 
-            volume->GetManagementObject()->getObjectId().encode(buffer);
-            // FIXME: 256??
-            buffer.getRawData(io_args->o_volume, 256);
+            return STATUS_OK;
         }
     }
 
