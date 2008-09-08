@@ -18,7 +18,7 @@
 # 
 
 SRC_DIR     = .
-QPID_DIR    = /usr/local
+QPID_DIR    = /usr
 SCHEMA_FILE = $(SRC_DIR)/libvirt-schema.xml
 GEN_DIR     = $(SRC_DIR)/gen
 OUT_FILE    = $(SRC_DIR)/libvirt-qpid
@@ -27,7 +27,7 @@ CC           = gcc
 LIB_DIR      = $(QPID_DIR)/lib
 CC_INCLUDES  = -I$(SRC_DIR) -I$(QPID_DIR)/include -I$(GEN_DIR)
 CC_FLAGS     = -g -O2
-LD_FLAGS     = -lqpidclient -lqpidcommon -lvirt -L$(LIB_DIR)
+LD_FLAGS     = -lqpidclient -lqpidcommon -lqmfagent -lvirt -L$(LIB_DIR)
 SPEC_DIR     = $(MGEN_DIR)
 MGEN         = qmf-gen
 OBJ_DIR      = $(SRC_DIR)/.libs
