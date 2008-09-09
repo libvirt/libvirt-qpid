@@ -23,6 +23,8 @@ using qpid::management::Manageable;
 using qpid::management::Args;
 using qpid::sys::Mutex;
 
+// Forward decl.
+class VolumeWrap;
 
 class PoolWrap : public Manageable
 {
@@ -33,6 +35,8 @@ class PoolWrap : public Manageable
 
     virConnectPtr conn;
     virStoragePoolPtr pool_ptr;
+
+    std::vector<VolumeWrap*> volumes;
 
 public:
 
@@ -48,6 +52,7 @@ public:
     }
 
     void update();
+    void syncVolumes();
 
     status_t ManagementMethod (uint32_t methodId, Args& args);
 };

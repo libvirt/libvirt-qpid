@@ -142,6 +142,9 @@
     <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
     <property name="name" type="sstr" access="RC" desc="Storage volume name"/>
 
+    <property name="capacity" type="uint64" desc="Capacity of storage volume in bytes"/>
+    <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
+
     <property name="storage_pool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
      desc="Pool where this storage volume exists"/>
 

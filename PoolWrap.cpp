@@ -41,6 +41,77 @@ PoolWrap::~PoolWrap()
 }
 
 void
+PoolWrap::syncVolumes()
+{
+    int maxactive;
+    int ret;
+    int i;
+
+    cout << "Syncing volumes.\n";
+
+    maxactive = virStoragePoolNumOfVolumes(pool_ptr);
+    if (maxactive < 0) {
+        //vshError(ctl, FALSE, "%s", _("Failed to list active vols"));
+        printf ("error getting number of volumes in pool\n");
+        return;
+    }
+
+    char *names[maxactive];
+
+    ret = virStoragePoolListVolumes(pool_ptr, names, maxactive);
+    if (ret < 0) {
+        printf ("error getting list of volumes\n");
+        return;
+    }
+
+    for (i = 0; i < ret; i++) {
+        virStorageVolPtr vol_ptr;
+        bool found = false;
+        char *volume_name = names[i];
+
+        for (std::vector<VolumeWrap*>::iterator iter = volumes.begin();
+             iter != volumes.end(); iter++) {
+            if ((*iter)->volume_name == volume_name) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            vol_ptr = virStorageVolLookupByName(pool_ptr, volume_name);
+            if (vol_ptr == NULL) {
+                printf("error looking up storage volume by name\n");
+                continue;
+            }
+
+            VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
+            printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
+            volumes.push_back(volume);
+        }
+    }
+
+    /* Go through our list of volumes and ensure that they still exist. */
+    for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
+
+        printf ("Verifying volume %s\n", (*iter)->volume_name.c_str());
+        virStorageVolPtr ptr = virStorageVolLookupByName(pool_ptr, (*iter)->volume_name.c_str());
+        if (ptr == NULL) {
+            printf("Destroying volume %s\n", (*iter)->volume_name.c_str());
+            delete (*iter);
+            iter = volumes.erase(iter);
+        } else {
+            virStorageVolFree(ptr);
+            iter++;
+        }
+    }
+
+    /* And finally *phew*, call update() on all volumes. */
+    for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
+        (*iter)->update();
+    }
+}
+
+void
 PoolWrap::update()
 {
     virStoragePoolInfo info;
@@ -51,7 +122,7 @@ PoolWrap::update()
         printf("PoolWrap: Unable to get info of storage pool\n");
         return;
     }
-    
+
     switch (info.state) {
         case VIR_STORAGE_POOL_INACTIVE:
             pool->set_state("inactive");
@@ -70,6 +141,8 @@ PoolWrap::update()
     pool->set_capacity(info.capacity);
     pool->set_allocation(info.allocation);
     pool->set_available(info.available);
+
+    syncVolumes();
 }
 
 Manageable::status_t

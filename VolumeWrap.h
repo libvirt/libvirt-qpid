@@ -32,10 +32,15 @@ class VolumeWrap : public Manageable
     Volume *volume;
     Mutex vectorLock;
 
+    std::string volume_key;
+    std::string volume_path;
+
     virConnectPtr conn;
     virStorageVolPtr volume_ptr;
 
 public:
+
+    std::string volume_name;
 
     VolumeWrap(ManagementAgent *agent, PoolWrap *parent, virStorageVolPtr pool_ptr, virConnectPtr connect);
     ~VolumeWrap();
@@ -44,6 +49,8 @@ public:
     {
         return volume;
     }
+
+    void update();
 
     status_t ManagementMethod (uint32_t methodId, Args& args);
 };

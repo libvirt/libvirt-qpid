@@ -226,7 +226,6 @@ void NodeWrap::syncPools()
 {
     int maxname;
     int maxinactive;
-    char **names;
 
     maxname = virConnectNumOfStoragePools(conn);
     if (maxname < 0) {
@@ -239,7 +238,6 @@ void NodeWrap::syncPools()
             printf("Error getting list of defined domains\n");
             exit(1);
         }
-
 
         for (int i = 0; i < maxname; i++) {
             checkPool(names[i]);

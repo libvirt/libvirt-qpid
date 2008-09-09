@@ -12,47 +12,54 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
                        virStorageVolPtr volume_pointer, virConnectPtr connect)
 {
     int ret;
-    const char *volume_key;
-    char *volume_path;
-    const char *volume_name;
+    const char *volume_key_s;
+    char *volume_path_s;
+    const char *volume_name_s;
 
     volume_ptr = volume_pointer;
     conn = connect;
 
-    volume_key = virStorageVolGetKey(volume_ptr);
-    if (volume_key == NULL) {
+    volume_key_s = virStorageVolGetKey(volume_ptr);
+    if (volume_key_s == NULL) {
         printf ("Error getting storage volume key\n");
         return;
     }
+    volume_key = volume_key_s;
 
-    volume_path = virStorageVolGetPath(volume_ptr);
-    if (volume_path == NULL) {
+    volume_path_s = virStorageVolGetPath(volume_ptr);
+    if (volume_path_s == NULL) {
         printf ("Error getting volume path\n");
         return;
     }
+    volume_path = volume_path_s;
 
-    volume_name = virStorageVolGetName(volume_ptr);
-    if (volume_name == NULL) {
+    volume_name_s = virStorageVolGetName(volume_ptr);
+    if (volume_name_s == NULL) {
         printf ("Error getting volume name\n");
         return;
     }
+    volume_name = volume_name_s;
 
     volume = new Volume(agent, this, parent, volume_key, volume_path, volume_name);
     agent->addObject(volume);
 }
 
-/*
-update()
+void
+VolumeWrap::update()
 {
-    virStorageVolumeInfo info;
+    virStorageVolInfo info;
+    int ret;
 
-    ret = virStorageVolumeGetInfo(volume_ptr, &info);
+    printf("Updating volume info\n");
+
+    ret = virStorageVolGetInfo(volume_ptr, &info);
     if (ret < 0) {
-        printf("VolumeWrap: Unable to get info of storage volume\n");
+        printf("VolumeWrap: Unable to get info of storage volume info\n");
         return;
     }
+    volume->set_capacity(info.capacity);
+    volume->set_allocation(info.allocation);
 }
-*/
 
 VolumeWrap::~VolumeWrap()
 {
