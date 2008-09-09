@@ -6,6 +6,7 @@
 #include "NodeWrap.h"
 #include "DomainWrap.h"
 #include "PoolWrap.h"
+#include "Error.h"
 
 #include "ArgsNodeDefine_domain_xml.h"
 #include "ArgsNodeStorage_pool_create_xml.h"
@@ -30,31 +31,31 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
     conn = virConnectOpen(NULL);
     if (!conn) {
-        printf ("Error connecting!\n");
+        REPORT_ERR(conn, "virConnectOpen");
         exit(1);
     }
 
     hostname = virConnectGetHostname(conn);
     if (hostname == NULL) {
-        printf ("Failed to get hostname\n");
+        REPORT_ERR(conn, "virConnectGetHostname");
         exit(1);
     }
 
     hv_type = virConnectGetType(conn);
     if (hv_type == NULL) {
-        printf ("Failed to get HV type\n");
+        REPORT_ERR(conn, "virConnectGetType");
         exit(1);
     }
 
     uri = virConnectGetURI(conn);
     if (uri == NULL) {
-        printf ("Failed to get uri\n");
+        REPORT_ERR(conn, "virConnectGetURI");
         exit(1);
     }
 
     ret = virGetVersion(&libvirt_v, hv_type, &api_v);
     if (ret < 0) {
-        printf ("Unable to get version info\n");
+        REPORT_ERR(conn, "virGetVersion");
     } else {
         major = libvirt_v / 1000000;
         libvirt_v %= 1000000;
@@ -71,7 +72,7 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
     ret = virConnectGetVersion(conn, &hv_v);
     if (ret < 0) {
-        printf ("Unable to get HV version info\n");
+        REPORT_ERR(conn, "virConnectGetVersion");
     } else {
         major = hv_v / 1000000;
         hv_v %= 1000000;
@@ -82,9 +83,6 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
     mgmtObject = new Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
     agent->addObject(mgmtObject);
-
-    syncDomains();
-
 }
 
 void NodeWrap::syncDomains()
@@ -93,14 +91,14 @@ void NodeWrap::syncDomains()
     /* Sync up with domains that are defined but not active. */
     int maxname = virConnectNumOfDefinedDomains(conn);
     if (maxname < 0) {
-        printf("Error getting max domain count\n");
-        exit(1);
+        REPORT_ERR(conn, "virConnectNumOfDefinedDomains");
+        return;
     } else {
         char *names[maxname];
 
         if ((maxname = virConnectListDefinedDomains(conn, names, maxname)) < 0) {
-            printf("Error getting list of defined domains\n");
-            exit(1);
+            REPORT_ERR(conn, "virConnectListDefinedDomains");
+            return;
         }
 
 
@@ -122,7 +120,7 @@ void NodeWrap::syncDomains()
 
             domain_ptr = virDomainLookupByName(conn, names[i]);
             if (!domain_ptr) {
-                printf ("Unable to get domain ptr for domain name %s\n", names[i]);
+                REPORT_ERR(conn, "virDomainLookupByName");
             } else {
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 printf("Created new domain: %s, ptr is %p\n", names[i], domain_ptr);
@@ -134,14 +132,14 @@ void NodeWrap::syncDomains()
     /* Go through all the active domains */
     int maxids = virConnectNumOfDomains(conn);
     if (maxids < 0) {
-        printf("Error getting max domain id count\n");
-        exit(1);
+        REPORT_ERR(conn, "virConnectNumOfDomains");
+        return;
     } else {
         int ids[maxids];
 
         if ((maxids = virConnectListDomains(conn, ids, maxids)) < 0) {
             printf("Error getting list of defined domains\n");
-            exit(1);
+            return;
         }
 
         for (int i = 0; i < maxids; i++) {
@@ -150,12 +148,12 @@ void NodeWrap::syncDomains()
 
             domain_ptr = virDomainLookupByID(conn, ids[i]);
             if (!domain_ptr) {
-                printf("Unable to get domain ptr for domain name %s\n", ids[i]);
+                REPORT_ERR(conn, "virDomainLookupByID");
                 continue;
             }
 
             if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
-                printf("1: Unable to get UUID string of domain\n");
+                REPORT_ERR(conn, "virDomainGetUUIDString");
                 continue;
             }
 
@@ -185,7 +183,7 @@ void NodeWrap::syncDomains()
         printf ("verifying domain %s\n", (*iter)->domain_name.c_str());
         virDomainPtr ptr = virDomainLookupByUUIDString(conn, (*iter)->domain_uuid.c_str());
         if (ptr == NULL) {
-            printf("Destroying domain %s\n", (*iter)->domain_name.c_str());
+            REPORT_ERR(conn, "virDomainLookupByUUIDString");
             delete (*iter);
             iter = domains.erase(iter);
         } else {
@@ -214,7 +212,7 @@ void NodeWrap::checkPool(char *pool_name)
 
     pool_ptr = virStoragePoolLookupByName(conn, pool_name);
     if (!pool_ptr) {
-        printf ("Unable to get pool ptr for pool name %s\n", pool_name);
+        REPORT_ERR(conn, "virStoragePoolLookupByName");
     } else {
         PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
         printf("Created new pool: %s, ptr is %p\n", pool_name, pool_ptr);
@@ -229,14 +227,14 @@ void NodeWrap::syncPools()
 
     maxname = virConnectNumOfStoragePools(conn);
     if (maxname < 0) {
-        printf ("Error getting number of storage pools\n");
+        REPORT_ERR(conn, "virConnectNumOfStroagePools");
         return;
     } else {
         char *names[maxname];
 
         if ((maxname = virConnectListStoragePools(conn, names, maxname)) < 0) {
-            printf("Error getting list of defined domains\n");
-            exit(1);
+            REPORT_ERR(conn, "virConnectListStoragePools");
+            return;
         }
 
         for (int i = 0; i < maxname; i++) {
@@ -246,14 +244,14 @@ void NodeWrap::syncPools()
 
     maxname = virConnectNumOfDefinedStoragePools(conn);
     if (maxname < 0) {
-        printf("Error getting max inactive pool count\n");
-        exit(1);
+        REPORT_ERR(conn, "virConnectNumOfDefinedStoragePools");
+        return;
     } else {
         char *names[maxname];
 
         if ((maxname = virConnectListDefinedStoragePools(conn, names, maxname)) < 0) {
-            printf("Error getting list of inactive storage pools\n");
-            exit(1);
+            REPORT_ERR(conn, "virConnectListDefinedStoragePools");
+            return;
         }
 
         for (int i = 0; i < maxname; i++) {
@@ -275,7 +273,6 @@ void NodeWrap::syncPools()
             iter++;
         }
     }
-
 }
 
 
@@ -292,6 +289,9 @@ void NodeWrap::doLoop()
         int read_fd = agent->getSignalFd();
         printf ("read ifd is %d\n", read_fd);
 
+        // FIXME: I think we should check the libvirt connection pointer here and if it's invalid
+        // we should go about trying to reconnect instead of all this other stuff. 
+
         /* Poll agent fd.  If any methods are being made this FD will be ready for reading.  */
         FD_ZERO(&fds);
         FD_SET(read_fd, &fds);
@@ -302,7 +302,7 @@ void NodeWrap::doLoop()
 
         retval = select(read_fd + 1, &fds, NULL, NULL, &tv);
         if (retval < 0) {
-            printf ("Error in select loop: %s\n", strerror(errno));
+            fprintf (stderr, "Error in select loop: %s\n", strerror(errno));
             continue;
         }
 
@@ -341,13 +341,15 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
             ArgsNodeDefine_domain_xml *io_args = (ArgsNodeDefine_domain_xml *) &args;
             domain_ptr = virDomainDefineXML(conn, io_args->i_xml_desc.c_str());
             if (!domain_ptr) {
-                printf("Error creating new domain from XML\n");
-                return STATUS_INVALID_PARAMETER;
+                REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
+                io_args->o_result = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
+                return STATUS_OK;
             } else {
                 qpid::framing::Buffer buffer;
 
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 io_args->o_domain = domain->GetManagementObject()->getObjectId();
+                io_args->o_result = "Success";
                 return STATUS_OK;
             }
         }
