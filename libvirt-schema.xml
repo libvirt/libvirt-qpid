@@ -107,6 +107,11 @@
     <property name="uuid" access="RC" type="sstr" desc="Pool UUID"/>
     <property name="name" access="RC" type="sstr" desc="Pool name"/>
     
+    <property name="state" type="sstr" desc="Pool state"/>
+    <property name="capacity" type="uint64" desc="Pool size in bytes"/>
+    <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
+    <property name="available" type="uint64" desc="Available space in bytes"/>
+    
     <!-- Set up an association of hosts to storage pools.  This will setup a list of pools in the node object
          and give us a reference here to the node. -->
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>

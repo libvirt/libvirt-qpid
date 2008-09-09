@@ -34,19 +34,6 @@ PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
     pool_ptr = pool_pointer;
 }
 
-/*
-update()
-{
-    virStoragePoolInfo info;
-
-    ret = virStoragePoolGetInfo(pool_ptr, &info);
-    if (ret < 0) {
-        printf("PoolWrap: Unable to get info of storage pool\n");
-        return;
-    }
-}
-*/
-
 PoolWrap::~PoolWrap()
 {
     pool->resourceDestroy();
@@ -56,7 +43,33 @@ PoolWrap::~PoolWrap()
 void
 PoolWrap::update()
 {
+    virStoragePoolInfo info;
+    int ret;
 
+    ret = virStoragePoolGetInfo(pool_ptr, &info);
+    if (ret < 0) {
+        printf("PoolWrap: Unable to get info of storage pool\n");
+        return;
+    }
+    
+    switch (info.state) {
+        case VIR_STORAGE_POOL_INACTIVE:
+            pool->set_state("inactive");
+            break;
+        case VIR_STORAGE_POOL_BUILDING:
+            pool->set_state("building");
+            break;
+        case VIR_STORAGE_POOL_RUNNING:
+            pool->set_state("running");
+            break;
+        case VIR_STORAGE_POOL_DEGRADED:
+            pool->set_state("degraded");
+            break;
+    }
+
+    pool->set_capacity(info.capacity);
+    pool->set_allocation(info.allocation);
+    pool->set_available(info.available);
 }
 
 Manageable::status_t
