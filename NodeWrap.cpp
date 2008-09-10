@@ -8,7 +8,7 @@
 #include "PoolWrap.h"
 #include "Error.h"
 
-#include "ArgsNodeDefine_domain_xml.h"
+#include "ArgsNodeDomain_define_xml.h"
 #include "ArgsNodeStorage_pool_create_xml.h"
 #include "ArgsNodeStorage_pool_define_xml.h"
 
@@ -329,35 +329,30 @@ void NodeWrap::doLoop()
 }
 
 Manageable::status_t
-NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
+NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     virDomainPtr domain_ptr;
     Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {
-        case Node::METHOD_DEFINE_DOMAIN_XML:
+        case Node::METHOD_DOMAIN_DEFINE_XML:
         {
-            ArgsNodeDefine_domain_xml *io_args = (ArgsNodeDefine_domain_xml *) &args;
+            ArgsNodeDomain_define_xml *io_args = (ArgsNodeDomain_define_xml *) &args;
             domain_ptr = virDomainDefineXML(conn, io_args->i_xml_desc.c_str());
             if (!domain_ptr) {
-                REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
-                io_args->o_result = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
-                return STATUS_OK;
+                //REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
+                errstr = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
+                return STATUS_USER;
             } else {
-                qpid::framing::Buffer buffer;
-
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 io_args->o_domain = domain->GetManagementObject()->getObjectId();
-                io_args->o_result = "Success";
                 return STATUS_OK;
             }
         }
 
         case Node::METHOD_STORAGE_POOL_DEFINE_XML:
         {
-            qpid::framing::Buffer buffer;
-
             ArgsNodeStorage_pool_define_xml *io_args = (ArgsNodeStorage_pool_define_xml *) &args;
             virStoragePoolPtr pool_ptr;
 
@@ -371,8 +366,6 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args)
         }
         case Node::METHOD_STORAGE_POOL_CREATE_XML:
         {
-            qpid::framing::Buffer buffer;
-
             ArgsNodeStorage_pool_create_xml *io_args = (ArgsNodeStorage_pool_create_xml *) &args;
             virStoragePoolPtr pool_ptr;
 

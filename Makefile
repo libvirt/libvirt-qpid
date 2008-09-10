@@ -41,7 +41,7 @@ cpps   += $(wildcard $(GEN_DIR)/*.cpp)
 deps    = $(addsuffix .d, $(basename $(cpps)))
 objects = $(addsuffix .o, $(basename $(cpps)))
 
-.PHONY: all clean
+.PHONY: all clean gen
 
 #==========================================================
 # Pass 0: generate source files from schema
@@ -51,8 +51,7 @@ all: gen
 	$(MAKE)
 
 gen:
-	$(MGEN) $(SCHEMA_FILE) $(GEN_DIR)
-
+	$(MGEN) -o  $(GEN_DIR) $(SCHEMA_FILE)
 clean:
 	rm -rf $(GEN_DIR) $(OUT_FILE) *.d *.o
 

@@ -55,7 +55,7 @@ public:
     void checkPool(char *pool_name);
     void syncPools();
 
-    status_t ManagementMethod (uint32_t methodId, Args& args);
+    status_t ManagementMethod (uint32_t methodId, Args& args, std::string &errstr);
 };
 
 

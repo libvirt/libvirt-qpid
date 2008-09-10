@@ -15,11 +15,10 @@
     <property name="hypervisor_version" type="sstr" access="RC" desc="Hypervisor Version"/>
     <property name="hypervisor_type" type="sstr" access="RC" desc="Hypervisor type"/>
     
-    <method name="define_domain_xml" desc="Define a new domain, but does not start it.">
+    <method name="domain_define_xml" desc="Define a new domain, but does not start it.">
       <arg name="xml_desc" dir="I" type="sstr" desc="XML domain description"/>
 
       <arg name="domain" dir="O" type="objId" desc="Newly created domain object"/>
-      <arg name="result" dir="O" type="sstr" desc="Result.  'error: msg' or 'success'."/>
     </method>
    
     <method name="storage_pool_define_xml" 
@@ -27,7 +26,6 @@
       <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
       
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
-      <arg name="result" dir="O" type="sstr" desc="Result.  'error: msg' or 'success'."/>
     </method>
     
     <method name="storage_pool_create_xml" 
