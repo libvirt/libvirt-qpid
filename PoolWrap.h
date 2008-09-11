@@ -54,7 +54,7 @@ public:
     void update();
     void syncVolumes();
 
-    status_t ManagementMethod (uint32_t methodId, Args& args);
+    status_t ManagementMethod (uint32_t methodId, Args& args, std::string &errstr);
 };
 
 

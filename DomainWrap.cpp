@@ -1,6 +1,7 @@
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
+#include "Error.h"
 
 #include "ArgsDomainMigrate.h"
 #include "ArgsDomainRestore.h"
@@ -13,7 +14,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
     char dom_uuid[VIR_UUID_STRING_BUFLEN];
 
     if (virDomainGetUUIDString(domain_pointer, dom_uuid) < 0) {
-        printf("DomainWrap: Unable to get UUID string of domain\n");
+        REPORT_ERR(conn, "DomainWrap: Unable to get UUID string of domain.");
         // FIXME: Not sure how to handle this one..
         return;
     }
@@ -22,7 +23,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
 
     const char *dom_name = virDomainGetName(domain_pointer);
     if (!dom_name) {
-        printf ("Unable to get domain name!\n");
+        REPORT_ERR(conn, "Unable to get domain name!\n");
         return;
     }
 
@@ -49,7 +50,7 @@ DomainWrap::update()
 
     ret = virDomainGetInfo(domain_ptr, &info);
     if (ret < 0) {
-        printf("Domain get info failed, domain dead?? - ptr %p\n", domain_ptr);
+        REPORT_ERR(conn, "Domain get info failed.");
         /* Next domainSync() will take care of this in the node wrapper if the domain is
          * indeed dead. */
         return;
@@ -98,10 +99,9 @@ DomainWrap::update()
 }
 
 Manageable::status_t
-DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
+DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     Mutex::ScopedLock _lock(vectorLock);
-    cout << "Method Received: " << methodId << endl;
     int ret;
 
     switch (methodId) {
@@ -109,7 +109,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainCreate(domain_ptr);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error creating new domain (virDomainCreate).");
+                return STATUS_USER;
             }
             return STATUS_OK;
 
@@ -117,7 +118,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainDestroy(domain_ptr);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error destroying domain (virDomainDestroy).");
+                return STATUS_USER;
             }
 
             return STATUS_OK;
@@ -126,7 +128,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainUndefine(domain_ptr);
 
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error undefining domain (virDomainUndefine).");
+                return STATUS_USER;
             }
 
             /* We now wait for domainSync() to clean this up. */
@@ -136,7 +139,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainSuspend(domain_ptr);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error suspending domain (virDomainSuspend).");
+                return STATUS_USER;
             }
             return STATUS_OK;
 
@@ -144,7 +148,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainResume(domain_ptr);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error resuming domain (virDomainResume).");
+                return STATUS_USER;
             }
             return STATUS_OK;
 
@@ -153,9 +158,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
                 ArgsDomainSave *ioArgs = (ArgsDomainSave *) &args;
 
                 ret = virDomainSave(domain_ptr, ioArgs->i_filename.c_str());
-                update();
                 if (ret < 0) {
-                    return STATUS_INVALID_PARAMETER;
+                    errstr = FORMAT_ERR(conn, "Error saving domain (virDomainSave).");
+                    return STATUS_USER;
                 }
                 return STATUS_OK;
             }
@@ -167,7 +172,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
                 ret = virDomainRestore(conn, ioArgs->i_filename.c_str());
                 update();
                 if (ret < 0) {
-                    return STATUS_INVALID_PARAMETER;
+                    errstr = FORMAT_ERR(conn, "Error restoring domain (virDomainRestore).");
+                    return STATUS_USER;
                 }
                 return STATUS_OK;
             }
@@ -176,7 +182,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainShutdown(domain_ptr);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error shutting down domain (virDomainShutdown).");
+                return STATUS_USER;
             }
             return STATUS_OK;
 
@@ -184,7 +191,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
             ret = virDomainReboot(domain_ptr, 0);
             update();
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error rebooting domain (virDomainReboot).");
+                return STATUS_USER;
             }
             return STATUS_OK;
 
@@ -196,7 +204,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args)
                 if (desc) {
                     ioArgs->o_description = desc;
                 } else {
-                    return STATUS_INVALID_PARAMETER;
+                    errstr = FORMAT_ERR(conn, "Error getting XML description of domain(virDomainGetXMLDesc).");
+                    return STATUS_USER;
                 }
                 return STATUS_OK;
             }

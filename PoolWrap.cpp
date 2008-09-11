@@ -2,6 +2,7 @@
 #include "NodeWrap.h"
 #include "PoolWrap.h"
 #include "VolumeWrap.h"
+#include "Error.h"
 
 #include "ArgsPoolCreate_volume_xml.h"
 #include "ArgsPoolXml_desc.h"
@@ -16,13 +17,13 @@ PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
 
     ret = virStoragePoolGetUUIDString(pool_ptr, pool_uuid_str);
     if (ret < 0) {
-        printf("PoolWrap: Unable to get UUID\n");
+        REPORT_ERR(conn, "PoolWrap: Unable to get UUID\n");
         return;
     }
 
     pool_name_str = virStoragePoolGetName(pool_ptr);
     if (pool_name_str == NULL) {
-        printf ("PoolWrap: error getting pool name\n");
+        REPORT_ERR(conn, "PoolWrap: error getting pool name\n");
     }
 
     pool_name = pool_name_str;
@@ -52,7 +53,7 @@ PoolWrap::syncVolumes()
     maxactive = virStoragePoolNumOfVolumes(pool_ptr);
     if (maxactive < 0) {
         //vshError(ctl, FALSE, "%s", _("Failed to list active vols"));
-        printf ("error getting number of volumes in pool\n");
+        REPORT_ERR(conn, "error getting number of volumes in pool\n");
         return;
     }
 
@@ -60,7 +61,7 @@ PoolWrap::syncVolumes()
 
     ret = virStoragePoolListVolumes(pool_ptr, names, maxactive);
     if (ret < 0) {
-        printf ("error getting list of volumes\n");
+        REPORT_ERR(conn, "error getting list of volumes\n");
         return;
     }
 
@@ -80,7 +81,7 @@ PoolWrap::syncVolumes()
         if (!found) {
             vol_ptr = virStorageVolLookupByName(pool_ptr, volume_name);
             if (vol_ptr == NULL) {
-                printf("error looking up storage volume by name\n");
+                REPORT_ERR(conn, "error looking up storage volume by name\n");
                 continue;
             }
 
@@ -119,7 +120,7 @@ PoolWrap::update()
 
     ret = virStoragePoolGetInfo(pool_ptr, &info);
     if (ret < 0) {
-        printf("PoolWrap: Unable to get info of storage pool\n");
+        REPORT_ERR(conn, "PoolWrap: Unable to get info of storage pool");
         return;
     }
 
@@ -146,7 +147,7 @@ PoolWrap::update()
 }
 
 Manageable::status_t
-PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
+PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
@@ -162,7 +163,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
             if (desc) {
                 ioArgs->o_description = desc;
             } else {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error getting XML description of storage pool (virStoragePoolGetXMLDesc).");
+                return STATUS_USER;
             }
             return STATUS_OK;
         }
@@ -171,7 +173,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
         {
             ret = virStoragePoolCreate(pool_ptr, 0);
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error creating new storage pool (virStoragePoolCreate).");
+                return STATUS_USER;
             }
             return STATUS_OK;
         }
@@ -180,7 +183,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
         {
             ret = virStoragePoolDestroy(pool_ptr);
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error destroying storage pool (virStoragePoolDestroy).");
+                return STATUS_USER;
             }
             return STATUS_OK;
         }
@@ -189,7 +193,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
         {
             ret = virStoragePoolDelete(pool_ptr, 0);
             if (ret < 0) {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error deleting storage pool (virStoragePoolDelete).");
+                return STATUS_USER;
             }
             return STATUS_OK;
         }
@@ -201,6 +206,10 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args)
             virStorageVolPtr volume_ptr;
 
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xml_desc.c_str(), 0);
+            if (volume_ptr == NULL) { 
+                errstr = FORMAT_ERR(conn, "Error creating new storage volume from XML description (virStorageVolCreateXML).");
+                return STATUS_USER;
+            }
 
             VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);
             io_args->o_volume = volume->GetManagementObject()->getObjectId();

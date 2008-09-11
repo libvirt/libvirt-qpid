@@ -5,6 +5,8 @@
 #include "NodeWrap.h"
 #include "PoolWrap.h"
 #include "VolumeWrap.h"
+#include "Error.h"
+
 
 #include "ArgsVolumeXml_desc.h"
 
@@ -21,21 +23,21 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
 
     volume_key_s = virStorageVolGetKey(volume_ptr);
     if (volume_key_s == NULL) {
-        printf ("Error getting storage volume key\n");
+        REPORT_ERR(conn, "Error getting storage volume key\n");
         return;
     }
     volume_key = volume_key_s;
 
     volume_path_s = virStorageVolGetPath(volume_ptr);
     if (volume_path_s == NULL) {
-        printf ("Error getting volume path\n");
+        REPORT_ERR(conn, "Error getting volume path\n");
         return;
     }
     volume_path = volume_path_s;
 
     volume_name_s = virStorageVolGetName(volume_ptr);
     if (volume_name_s == NULL) {
-        printf ("Error getting volume name\n");
+        REPORT_ERR(conn, "Error getting volume name\n");
         return;
     }
     volume_name = volume_name_s;
@@ -54,7 +56,7 @@ VolumeWrap::update()
 
     ret = virStorageVolGetInfo(volume_ptr, &info);
     if (ret < 0) {
-        printf("VolumeWrap: Unable to get info of storage volume info\n");
+        REPORT_ERR(conn, "VolumeWrap: Unable to get info of storage volume info\n");
         return;
     }
     volume->set_capacity(info.capacity);
@@ -68,7 +70,7 @@ VolumeWrap::~VolumeWrap()
 }
 
 Manageable::status_t
-VolumeWrap::ManagementMethod(uint32_t methodId, Args& args)
+VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
@@ -84,7 +86,8 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args)
             if (desc) {
                 io_args->o_description = desc;
             } else {
-                return STATUS_INVALID_PARAMETER;
+                errstr = FORMAT_ERR(conn, "Error getting xml description for volume (virStorageVolGetXMLDesc).");
+                return STATUS_USER;
             }
             return STATUS_OK;
         }

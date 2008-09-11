@@ -357,6 +357,10 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             virStoragePoolPtr pool_ptr;
 
             pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xml_desc.c_str(), 0);
+            if (pool_ptr == NULL) {
+                errstr = FORMAT_ERR(conn, "Error defining storage pool using xml description (virStoragePoolDefineXML).");
+                return STATUS_USER;
+            }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
 
@@ -370,6 +374,10 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             virStoragePoolPtr pool_ptr;
 
             pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xml_desc.c_str(), 0);
+            if (pool_ptr == NULL) {
+                errstr = FORMAT_ERR(conn, "Error creating storage pool using xml description (virStoragePoolCreateXML).");
+                return STATUS_USER;
+            }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
             io_args->o_pool = pool->GetManagementObject()->getObjectId();
