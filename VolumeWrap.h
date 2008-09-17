@@ -30,7 +30,6 @@ class VolumeWrap : public Manageable
 {
     ManagementAgent *agent;
     Volume *volume;
-    Mutex vectorLock;
 
     std::string volume_key;
     std::string volume_path;

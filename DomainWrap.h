@@ -28,7 +28,6 @@ class DomainWrap : public Manageable
 {
     ManagementAgent *agent;
     Domain *domain;
-    Mutex vectorLock;
 
     virConnectPtr conn;
     virDomainPtr domain_ptr;

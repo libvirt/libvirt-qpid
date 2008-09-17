@@ -101,7 +101,6 @@ DomainWrap::update()
 Manageable::status_t
 DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
-    Mutex::ScopedLock _lock(vectorLock);
     int ret;
 
     switch (methodId) {

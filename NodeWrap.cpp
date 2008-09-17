@@ -285,7 +285,6 @@ void NodeWrap::doLoop()
     /* Go through all domains and call update() for each, letting them update
      * information and statistics. */
     while (1) {
-        Mutex::ScopedLock _lock(vectorLock);
         int read_fd = agent->getSignalFd();
         printf ("read ifd is %d\n", read_fd);
 
@@ -332,7 +331,6 @@ Manageable::status_t
 NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     virDomainPtr domain_ptr;
-    Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {

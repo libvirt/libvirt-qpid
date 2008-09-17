@@ -30,8 +30,6 @@ class PoolWrap : public Manageable
 {
     ManagementAgent *agent;
     Pool *pool;
-    Mutex vectorLock;
-
 
     virConnectPtr conn;
     virStoragePoolPtr pool_ptr;

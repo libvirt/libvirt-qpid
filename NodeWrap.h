@@ -36,7 +36,6 @@ class NodeWrap : public Manageable
     string name;
     ManagementAgent *agent;
     Node *mgmtObject;
-    Mutex vectorLock;
     std::vector<DomainWrap*> domains;
     std::vector<PoolWrap*> pools;
 

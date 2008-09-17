@@ -149,7 +149,6 @@ PoolWrap::update()
 Manageable::status_t
 PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
-    Mutex::ScopedLock _lock(vectorLock);
     cout << "Method Received: " << methodId << endl;
     int ret;
 
