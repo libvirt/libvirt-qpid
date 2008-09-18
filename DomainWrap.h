@@ -3,8 +3,8 @@
 #include <qpid/agent/ManagementAgent.h>
 #include <qpid/sys/Mutex.h>
 
-#include "PackageLibvirt.h"
-#include "Domain.h"
+#include "qmf/com/redhat/libvirt/Package.h"
+#include "qmf/com/redhat/libvirt/Domain.h"
 
 #include <unistd.h>
 #include <cstdlib>
@@ -23,11 +23,10 @@ using qpid::management::Manageable;
 using qpid::management::Args;
 using qpid::sys::Mutex;
 
-
 class DomainWrap : public Manageable
 {
     ManagementAgent *agent;
-    Domain *domain;
+    qmf::com::redhat::libvirt::Domain *domain;
 
     virConnectPtr conn;
     virDomainPtr domain_ptr;

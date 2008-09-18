@@ -3,10 +3,12 @@
 #include "DomainWrap.h"
 #include "Error.h"
 
-#include "ArgsDomainMigrate.h"
-#include "ArgsDomainRestore.h"
-#include "ArgsDomainSave.h"
-#include "ArgsDomainXml_desc.h"
+#include "qmf/com/redhat/libvirt/ArgsDomainMigrate.h"
+#include "qmf/com/redhat/libvirt/ArgsDomainRestore.h"
+#include "qmf/com/redhat/libvirt/ArgsDomainSave.h"
+#include "qmf/com/redhat/libvirt/ArgsDomainXml_desc.h"
+
+namespace _qmf = qmf::com::redhat::libvirt;
 
 DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_pointer,
                          virConnectPtr connect)
@@ -29,7 +31,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
 
     domain_name = dom_name;
 
-    domain = new Domain(agent, this, parent, domain_uuid, domain_name);
+    domain = new _qmf::Domain(agent, this, parent, domain_uuid, domain_name);
     agent->addObject(domain);
     conn = connect;
     domain_ptr = domain_pointer;
@@ -104,7 +106,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     int ret;
 
     switch (methodId) {
-        case Domain::METHOD_CREATE:
+        case _qmf::Domain::METHOD_CREATE:
             ret = virDomainCreate(domain_ptr);
             update();
             if (ret < 0) {
@@ -113,7 +115,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case Domain::METHOD_DESTROY:
+        case _qmf::Domain::METHOD_DESTROY:
             ret = virDomainDestroy(domain_ptr);
             update();
             if (ret < 0) {
@@ -123,7 +125,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
             return STATUS_OK;
 
-        case Domain::METHOD_UNDEFINE:
+        case _qmf::Domain::METHOD_UNDEFINE:
             ret = virDomainUndefine(domain_ptr);
 
             if (ret < 0) {
@@ -134,7 +136,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             /* We now wait for domainSync() to clean this up. */
             return STATUS_OK;
 
-        case Domain::METHOD_SUSPEND:
+        case _qmf::Domain::METHOD_SUSPEND:
             ret = virDomainSuspend(domain_ptr);
             update();
             if (ret < 0) {
@@ -143,7 +145,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case Domain::METHOD_RESUME:
+        case _qmf::Domain::METHOD_RESUME:
             ret = virDomainResume(domain_ptr);
             update();
             if (ret < 0) {
@@ -152,9 +154,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case Domain::METHOD_SAVE:
+        case _qmf::Domain::METHOD_SAVE:
             {
-                ArgsDomainSave *ioArgs = (ArgsDomainSave *) &args;
+                _qmf::ArgsDomainSave *ioArgs = (_qmf::ArgsDomainSave *) &args;
 
                 ret = virDomainSave(domain_ptr, ioArgs->i_filename.c_str());
                 if (ret < 0) {
@@ -164,9 +166,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_OK;
             }
 
-        case Domain::METHOD_RESTORE:
+        case _qmf::Domain::METHOD_RESTORE:
             {
-                ArgsDomainRestore *ioArgs = (ArgsDomainRestore *) &args;
+                _qmf::ArgsDomainRestore *ioArgs = (_qmf::ArgsDomainRestore *) &args;
 
                 ret = virDomainRestore(conn, ioArgs->i_filename.c_str());
                 update();
@@ -177,7 +179,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_OK;
             }
 
-        case Domain::METHOD_SHUTDOWN:
+        case _qmf::Domain::METHOD_SHUTDOWN:
             ret = virDomainShutdown(domain_ptr);
             update();
             if (ret < 0) {
@@ -186,7 +188,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case Domain::METHOD_REBOOT:
+        case _qmf::Domain::METHOD_REBOOT:
             ret = virDomainReboot(domain_ptr, 0);
             update();
             if (ret < 0) {
@@ -195,9 +197,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case Domain::METHOD_XML_DESC:
+        case _qmf::Domain::METHOD_XML_DESC:
             {
-                ArgsDomainXml_desc *ioArgs = (ArgsDomainXml_desc *) &args;
+                _qmf::ArgsDomainXml_desc *ioArgs = (_qmf::ArgsDomainXml_desc *) &args;
                 char *desc;
                 desc = virDomainGetXMLDesc(domain_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
                 if (desc) {
@@ -209,9 +211,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_OK;
             }
 
-        case Domain::METHOD_MIGRATE:
+        case _qmf::Domain::METHOD_MIGRATE:
             {
-                ArgsDomainMigrate *ioArgs = (ArgsDomainMigrate *) &args;
+                _qmf::ArgsDomainMigrate *ioArgs = (_qmf::ArgsDomainMigrate *) &args;
 
                 // ret = virDomainMigrate(domain_ptr, ioArgs->i_filename.c_str());
                 return STATUS_NOT_IMPLEMENTED;

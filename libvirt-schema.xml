@@ -1,4 +1,4 @@
-<schema package="Libvirt">
+<schema package="com.redhat.libvirt">
 
   <!-- This is an object model of the libvirt API.
        access: Access mode: RC = Read/Create, RO = read only, RW = read/write.

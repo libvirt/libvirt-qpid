@@ -7,8 +7,9 @@
 #include "VolumeWrap.h"
 #include "Error.h"
 
+#include "qmf/com/redhat/libvirt/ArgsVolumeXml_desc.h"
 
-#include "ArgsVolumeXml_desc.h"
+namespace _qmf = qmf::com::redhat::libvirt;
 
 VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent, 
                        virStorageVolPtr volume_pointer, virConnectPtr connect)
@@ -42,7 +43,7 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
     }
     volume_name = volume_name_s;
 
-    volume = new Volume(agent, this, parent, volume_key, volume_path, volume_name);
+    volume = new _qmf::Volume(agent, this, parent, volume_key, volume_path, volume_name);
     agent->addObject(volume);
 }
 
@@ -76,9 +77,9 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     int ret;
 
     switch (methodId) {
-        case Volume::METHOD_XML_DESC:
+    case _qmf::Volume::METHOD_XML_DESC:
         {
-            ArgsVolumeXml_desc *io_args = (ArgsVolumeXml_desc *) &args;
+            _qmf::ArgsVolumeXml_desc *io_args = (_qmf::ArgsVolumeXml_desc *) &args;
             char *desc;
 
             desc = virStorageVolGetXMLDesc(volume_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);

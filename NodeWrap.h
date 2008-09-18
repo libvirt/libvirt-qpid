@@ -4,10 +4,10 @@
 #include <qpid/agent/ManagementAgent.h>
 #include <qpid/sys/Mutex.h>
 
-#include "PackageLibvirt.h"
-#include "Node.h"
-#include "Domain.h"
-#include "Pool.h"
+#include "qmf/com/redhat/libvirt/Package.h"
+#include "qmf/com/redhat/libvirt/Node.h"
+#include "qmf/com/redhat/libvirt/Domain.h"
+#include "qmf/com/redhat/libvirt/Pool.h"
 
 #include <unistd.h>
 #include <cstdlib>
@@ -35,7 +35,7 @@ class NodeWrap : public Manageable
 {
     string name;
     ManagementAgent *agent;
-    Node *mgmtObject;
+    qmf::com::redhat::libvirt::Node *mgmtObject;
     std::vector<DomainWrap*> domains;
     std::vector<PoolWrap*> pools;
 

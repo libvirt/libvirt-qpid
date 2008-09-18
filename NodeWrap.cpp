@@ -8,10 +8,11 @@
 #include "PoolWrap.h"
 #include "Error.h"
 
-#include "ArgsNodeDomain_define_xml.h"
-#include "ArgsNodeStorage_pool_create_xml.h"
-#include "ArgsNodeStorage_pool_define_xml.h"
+#include "qmf/com/redhat/libvirt/ArgsNodeDomain_define_xml.h"
+#include "qmf/com/redhat/libvirt/ArgsNodeStorage_pool_create_xml.h"
+#include "qmf/com/redhat/libvirt/ArgsNodeStorage_pool_define_xml.h"
 
+namespace _qmf = qmf::com::redhat::libvirt;
 
 NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_agent)
 {
@@ -81,7 +82,7 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         snprintf(hv_version, sizeof(hv_version), "%d.%d.%d", major, minor, rel);
     }
 
-    mgmtObject = new Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
+    mgmtObject = new _qmf::Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
     agent->addObject(mgmtObject);
 }
 
@@ -334,9 +335,9 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {
-        case Node::METHOD_DOMAIN_DEFINE_XML:
+        case _qmf::Node::METHOD_DOMAIN_DEFINE_XML:
         {
-            ArgsNodeDomain_define_xml *io_args = (ArgsNodeDomain_define_xml *) &args;
+            _qmf::ArgsNodeDomain_define_xml *io_args = (_qmf::ArgsNodeDomain_define_xml *) &args;
             domain_ptr = virDomainDefineXML(conn, io_args->i_xml_desc.c_str());
             if (!domain_ptr) {
                 //REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
@@ -349,9 +350,9 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
         }
 
-        case Node::METHOD_STORAGE_POOL_DEFINE_XML:
+        case _qmf::Node::METHOD_STORAGE_POOL_DEFINE_XML:
         {
-            ArgsNodeStorage_pool_define_xml *io_args = (ArgsNodeStorage_pool_define_xml *) &args;
+            _qmf::ArgsNodeStorage_pool_define_xml *io_args = (_qmf::ArgsNodeStorage_pool_define_xml *) &args;
             virStoragePoolPtr pool_ptr;
 
             pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xml_desc.c_str(), 0);
@@ -366,9 +367,9 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
 
         }
-        case Node::METHOD_STORAGE_POOL_CREATE_XML:
+        case _qmf::Node::METHOD_STORAGE_POOL_CREATE_XML:
         {
-            ArgsNodeStorage_pool_create_xml *io_args = (ArgsNodeStorage_pool_create_xml *) &args;
+            _qmf::ArgsNodeStorage_pool_create_xml *io_args = (_qmf::ArgsNodeStorage_pool_create_xml *) &args;
             virStoragePoolPtr pool_ptr;
 
             pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xml_desc.c_str(), 0);
@@ -400,7 +401,7 @@ int main(int argc, char** argv) {
     ManagementAgent* agent = singleton.getInstance();
 
     // Register the schema with the agent
-    PackageLibvirt packageInit(agent);
+    _qmf::Package packageInit(agent);
 
     // Start the agent.  It will attempt to make a connection to the
     // management broker.  The third argument is the interval for sending

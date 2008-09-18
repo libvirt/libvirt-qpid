@@ -3,8 +3,8 @@
 #include <qpid/agent/ManagementAgent.h>
 #include <qpid/sys/Mutex.h>
 
-#include "PackageLibvirt.h"
-#include "Pool.h"
+#include "qmf/com/redhat/libvirt/Package.h"
+#include "qmf/com/redhat/libvirt/Pool.h"
 
 #include <unistd.h>
 #include <cstdlib>
@@ -29,7 +29,7 @@ class VolumeWrap;
 class PoolWrap : public Manageable
 {
     ManagementAgent *agent;
-    Pool *pool;
+    qmf::com::redhat::libvirt::Pool *pool;
 
     virConnectPtr conn;
     virStoragePoolPtr pool_ptr;

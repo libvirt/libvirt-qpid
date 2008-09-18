@@ -4,9 +4,11 @@
 #include "VolumeWrap.h"
 #include "Error.h"
 
-#include "ArgsPoolCreate_volume_xml.h"
-#include "ArgsPoolXml_desc.h"
-#include "ArgsVolumeXml_desc.h"
+#include "qmf/com/redhat/libvirt/ArgsPoolCreate_volume_xml.h"
+#include "qmf/com/redhat/libvirt/ArgsPoolXml_desc.h"
+#include "qmf/com/redhat/libvirt/ArgsVolumeXml_desc.h"
+
+namespace _qmf = qmf::com::redhat::libvirt;
 
 PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
                    virStoragePoolPtr pool_pointer, virConnectPtr connect)
@@ -29,7 +31,7 @@ PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
     pool_name = pool_name_str;
     pool_uuid = pool_uuid_str;
 
-    pool = new Pool(agent, this, parent, pool_uuid, pool_name);
+    pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name);
     agent->addObject(pool);
     conn = connect;
     pool_ptr = pool_pointer;
@@ -153,9 +155,9 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     int ret;
 
     switch (methodId) {
-        case Pool::METHOD_XML_DESC:
+        case _qmf::Pool::METHOD_XML_DESC:
         {
-            ArgsPoolXml_desc *ioArgs = (ArgsPoolXml_desc *) &args;
+            _qmf::ArgsPoolXml_desc *ioArgs = (_qmf::ArgsPoolXml_desc *) &args;
             char *desc;
 
             desc = virStoragePoolGetXMLDesc(pool_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
@@ -168,7 +170,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
-        case Pool::METHOD_CREATE:
+        case _qmf::Pool::METHOD_CREATE:
         {
             ret = virStoragePoolCreate(pool_ptr, 0);
             if (ret < 0) {
@@ -178,7 +180,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
-        case Pool::METHOD_DESTROY:
+        case _qmf::Pool::METHOD_DESTROY:
         {
             ret = virStoragePoolDestroy(pool_ptr);
             if (ret < 0) {
@@ -188,7 +190,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
-        case Pool::METHOD_DELETE:
+        case _qmf::Pool::METHOD_DELETE:
         {
             ret = virStoragePoolDelete(pool_ptr, 0);
             if (ret < 0) {
@@ -198,10 +200,10 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
-        case Pool::METHOD_CREATE_VOLUME_XML:
+        case _qmf::Pool::METHOD_CREATE_VOLUME_XML:
         {
             qpid::framing::Buffer buffer;
-            ArgsPoolCreate_volume_xml *io_args = (ArgsPoolCreate_volume_xml *) &args;
+            _qmf::ArgsPoolCreate_volume_xml *io_args = (_qmf::ArgsPoolCreate_volume_xml *) &args;
             virStorageVolPtr volume_ptr;
 
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xml_desc.c_str(), 0);

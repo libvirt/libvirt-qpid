@@ -37,7 +37,7 @@ vpath %.d   $(OBJ_DIR)
 vpath %.o   $(OBJ_DIR)
 
 cpps    = $(wildcard $(SRC_DIR)/*.cpp)
-cpps   += $(wildcard $(GEN_DIR)/*.cpp)
+cpps   += $(wildcard $(GEN_DIR)/qmf/com/redhat/libvirt/*.cpp)
 deps    = $(addsuffix .d, $(basename $(cpps)))
 objects = $(addsuffix .o, $(basename $(cpps)))
 
@@ -51,7 +51,7 @@ all: gen
 	$(MAKE)
 
 gen:
-	$(MGEN) -o  $(GEN_DIR) $(SCHEMA_FILE)
+	$(MGEN) -o  $(GEN_DIR)/qmf $(SCHEMA_FILE)
 clean:
 	rm -rf $(GEN_DIR) $(OUT_FILE) *.d *.o
 
