@@ -25,7 +25,7 @@ OUT_FILE    = $(SRC_DIR)/libvirt-qpid
 
 CC           = gcc
 LIB_DIR      = $(QPID_DIR)/lib
-CC_INCLUDES  = -I$(SRC_DIR) -I$(QPID_DIR)/include -I$(GEN_DIR)
+CC_INCLUDES  = -I$(SRC_DIR) -I$(QPID_DIR)/include -I$(GEN_DIR)/qmf/com/redhat/libvirt
 CC_FLAGS     = -g -O2
 LD_FLAGS     = -lqpidclient -lqpidcommon -lqmfagent -lvirt -L$(LIB_DIR)
 SPEC_DIR     = $(MGEN_DIR)

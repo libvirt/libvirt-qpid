@@ -4,9 +4,9 @@
 #include "VolumeWrap.h"
 #include "Error.h"
 
-#include "qmf/com/redhat/libvirt/ArgsPoolCreate_volume_xml.h"
-#include "qmf/com/redhat/libvirt/ArgsPoolXml_desc.h"
-#include "qmf/com/redhat/libvirt/ArgsVolumeXml_desc.h"
+#include "ArgsPoolCreate_volume_xml.h"
+#include "ArgsPoolXml_desc.h"
+#include "ArgsVolumeXml_desc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 

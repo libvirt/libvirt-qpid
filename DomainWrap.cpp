@@ -3,10 +3,10 @@
 #include "DomainWrap.h"
 #include "Error.h"
 
-#include "qmf/com/redhat/libvirt/ArgsDomainMigrate.h"
-#include "qmf/com/redhat/libvirt/ArgsDomainRestore.h"
-#include "qmf/com/redhat/libvirt/ArgsDomainSave.h"
-#include "qmf/com/redhat/libvirt/ArgsDomainXml_desc.h"
+#include "ArgsDomainMigrate.h"
+#include "ArgsDomainRestore.h"
+#include "ArgsDomainSave.h"
+#include "ArgsDomainXml_desc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 

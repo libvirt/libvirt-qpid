@@ -4,10 +4,10 @@
 #include <qpid/agent/ManagementAgent.h>
 #include <qpid/sys/Mutex.h>
 
-#include "qmf/com/redhat/libvirt/Package.h"
-#include "qmf/com/redhat/libvirt/Node.h"
-#include "qmf/com/redhat/libvirt/Domain.h"
-#include "qmf/com/redhat/libvirt/Pool.h"
+#include "Package.h"
+#include "Node.h"
+#include "Domain.h"
+#include "Pool.h"
 
 #include <unistd.h>
 #include <cstdlib>

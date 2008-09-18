@@ -3,8 +3,8 @@
 #include <qpid/agent/ManagementAgent.h>
 #include <qpid/sys/Mutex.h>
 
-#include "qmf/com/redhat/libvirt/Package.h"
-#include "qmf/com/redhat/libvirt/Domain.h"
+#include "Package.h"
+#include "Domain.h"
 
 #include <unistd.h>
 #include <cstdlib>

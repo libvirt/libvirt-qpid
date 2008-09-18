@@ -8,9 +8,9 @@
 #include "PoolWrap.h"
 #include "Error.h"
 
-#include "qmf/com/redhat/libvirt/ArgsNodeDomain_define_xml.h"
-#include "qmf/com/redhat/libvirt/ArgsNodeStorage_pool_create_xml.h"
-#include "qmf/com/redhat/libvirt/ArgsNodeStorage_pool_define_xml.h"
+#include "ArgsNodeDomain_define_xml.h"
+#include "ArgsNodeStorage_pool_create_xml.h"
+#include "ArgsNodeStorage_pool_define_xml.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
