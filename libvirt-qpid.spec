@@ -4,20 +4,21 @@ AutoReq: no
 Version: 0.1.1
 Release: 1
 Source: libvirt-qpid-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
 Group: Applications/System
 Requires: qmf >= 0.3.696027
-Requires: qpidd >= 3.696027
+Requires: qpidd >= 0.3.696027
 Requires: qpidc >= 0.3.696027
 Requires: libvirt >= 0.4.4
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
-BuildRequires: qpidd-devel >= 3.696027
-BuildRequires: qpidc-devel >= 3.696027
+BuildRequires: qpidd-devel >= 0.3.696027
+BuildRequires: qpidc-devel >= 0.3.696027
 BuildRequires: libvirt-devel >= 0.4.4
 BuildRequires: qmf-devel >= 0.3.696027
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+#BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 #Url: http://libvirt.org/html/libvirt-qpid
 
 %description
@@ -35,10 +36,12 @@ a set of objects with properties and methods.
 %setup -q
 
 %build
-(cd src && make)
+%configure
+make
 
 %install
-(cd src && make install)
+rm -rf %{buildroot}
+%makeinstall
 
 %post
 #/sbin/chkconfig --add libvirt-qpid
@@ -53,7 +56,6 @@ a set of objects with properties and methods.
 %postun
 #if [ "$1" -ge "1" ]; then
     #/sbin/service libvirt-qpid condrestart >/dev/null 2>&1 || :
-    #/sbin/service httpd condrestart >/dev/null 2>&1 || :
 #fi
 
 %clean
@@ -61,18 +63,19 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %files
 
+%dir %{_datadir}/libvirt-qpid/
 %defattr(644,root,root)
 /usr/share/libvirt-qpid/libvirt-schema.xml
 
 %defattr(755,root,root)
-%{_sbindir}/libvirt-qpid
+%{_bindir}/libvirt-qpid
 
-%doc AUTHORS CHANGELOG README COPYING
+%doc AUTHORS COPYING
 
 
 %changelog
 
-* Fri Sep 19 12:47:16 PDT 2008
+* Fri Sep 19 2008 Ian Main <imain@redhat.com - 0.1.1
 - Initial packaging.
 
 

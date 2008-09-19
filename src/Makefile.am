@@ -50,7 +50,7 @@ CLEANFILES = $(generated_file_list)
 
 libvirt_qpid_LDADD = -lqpidclient -lqpidcommon -lqmfagent -lvirt
 
-EXTRA_DIST = libvirt-schema.xml
+dist_pkgdata_DATA = libvirt-schema.xml
 
 #CLEANFILES = *.gcov .libs/*.gcda .libs/*.gcno *.gcno *.gcda
 
