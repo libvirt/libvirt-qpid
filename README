@@ -1,0 +1,8 @@
+libvirt-qpid provides an interface with libvirt using QMF (qpid modeling
+framework) which utilizes the AMQP protocol.  The Advanced Message Queuing
+Protocol (AMQP) is an open standard application layer protocol providing
+reliable transport of messages.
+
+QMF provides a modeling framework layer on top of qpid (which implements 
+AMQP).  This interface allows you to manage hosts, domains, pools etc. as
+a set of objects with properties and methods.
