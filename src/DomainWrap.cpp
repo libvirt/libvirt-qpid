@@ -213,7 +213,7 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Domain::METHOD_MIGRATE:
             {
-                _qmf::ArgsDomainMigrate *ioArgs = (_qmf::ArgsDomainMigrate *) &args;
+                //_qmf::ArgsDomainMigrate *ioArgs = (_qmf::ArgsDomainMigrate *) &args;
 
                 // ret = virDomainMigrate(domain_ptr, ioArgs->i_filename.c_str());
                 return STATUS_NOT_IMPLEMENTED;

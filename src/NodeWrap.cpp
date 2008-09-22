@@ -95,9 +95,9 @@ void NodeWrap::syncDomains()
         REPORT_ERR(conn, "virConnectNumOfDefinedDomains");
         return;
     } else {
-        char *names[maxname];
+        char *dnames[maxname];
 
-        if ((maxname = virConnectListDefinedDomains(conn, names, maxname)) < 0) {
+        if ((maxname = virConnectListDefinedDomains(conn, dnames, maxname)) < 0) {
             REPORT_ERR(conn, "virConnectListDefinedDomains");
             return;
         }
@@ -109,7 +109,7 @@ void NodeWrap::syncDomains()
             bool found = false;
             for (std::vector<DomainWrap*>::iterator iter = domains.begin();
                     iter != domains.end(); iter++) {
-                if ((*iter)->domain_name == names[i]) {
+                if ((*iter)->domain_name == dnames[i]) {
                     found = true;
                     break;
                 }
@@ -119,12 +119,12 @@ void NodeWrap::syncDomains()
                 continue;
             }
 
-            domain_ptr = virDomainLookupByName(conn, names[i]);
+            domain_ptr = virDomainLookupByName(conn, dnames[i]);
             if (!domain_ptr) {
                 REPORT_ERR(conn, "virDomainLookupByName");
             } else {
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-                printf("Created new domain: %s, ptr is %p\n", names[i], domain_ptr);
+                printf("Created new domain: %s, ptr is %p\n", dnames[i], domain_ptr);
                 domains.push_back(domain);
             }
         }
@@ -224,7 +224,6 @@ void NodeWrap::checkPool(char *pool_name)
 void NodeWrap::syncPools()
 {
     int maxname;
-    int maxinactive;
 
     maxname = virConnectNumOfStoragePools(conn);
     if (maxname < 0) {

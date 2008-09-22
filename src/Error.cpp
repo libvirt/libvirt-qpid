@@ -54,6 +54,7 @@ getErrorSource(virErrorPtr err)
         case VIR_FROM_STORAGE:
             return "storage";
     }
+    return "unknown";
 }
 
 
@@ -65,12 +66,12 @@ formatError(virConnectPtr conn, const char *msg, const char *function, int line,
     std::ostringstream errmsg;
 
     if (!conn) {
-        errmsg << "NULL connection: " << msg, file, function, line;
+        errmsg << "NULL connection: " << msg << " " << file << " " << function << " " << line;
         return errmsg.str();
     }
     err = virConnGetLastError(conn);
     if (!err) {
-        errmsg << "NULL error handle: " << msg, file, function, line;
+        errmsg << "NULL error handle: " << msg << " " << file << " " << function << " " << line;
         return errmsg.str();
     }
 

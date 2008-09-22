@@ -14,7 +14,6 @@ namespace _qmf = qmf::com::redhat::libvirt;
 VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent, 
                        virStorageVolPtr volume_pointer, virConnectPtr connect)
 {
-    int ret;
     const char *volume_key_s;
     char *volume_path_s;
     const char *volume_name_s;
@@ -74,7 +73,6 @@ Manageable::status_t
 VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     cout << "Method Received: " << methodId << endl;
-    int ret;
 
     switch (methodId) {
     case _qmf::Volume::METHOD_XML_DESC:
