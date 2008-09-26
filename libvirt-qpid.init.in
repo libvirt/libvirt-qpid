@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# the following is the LSB init header see
+# http://www.linux-foundation.org/spec//booksets/LSB-Core-generic/LSB-Core-generic.html#INITSCRCOMCONV
+#
+### BEGIN INIT INFO
+# Provides: libvirt-qpid
+# Should-Start: libvirtd
+# Default-Start: 3 4 5
+# Short-Description: gateway daemon to interact with libvirt viq qpid
+# Description: This is a daemon for interacting with libvirt viq qpid QMF.
+### END INIT INFO
+
+# the following is chkconfig init header
+#
+# libvirt-qpid:   gateway daemon to interact with libvirt viq qpid
+#
+# chkconfig: 345 98 03
+# description: This is a daemon for interacting with libvirt viq qpid QMF.
+#
+# processname: libvirt-qpid
+# pidfile: @localstatedir@/run/libvirt-qpid.pid
+#
+
+# Sanity checks.
+[ -x @sbindir@/libvirt-qpid ] || exit 0
+
+# Source function library.
+. @sysconfdir@/rc.d/init.d/functions
+
+SERVICE=libvirt-qpid
+PROCESS=libvirt-qpid
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting $SERVICE daemon: "
+    daemon --check $SERVICE $PROCESS --daemon
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch @localstatedir@/lock/subsys/$SERVICE
+}
+
+stop() {
+    echo -n $"Stopping $SERVICE daemon: "
+
+    killproc $PROCESS
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+        rm -f @localstatedir@/lock/subsys/$SERVICE
+        rm -f @localstatedir@/run/$SERVICE.pid
+    fi
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    echo -n $"Reloading $SERVICE configuration: "
+
+    killproc $PROCESS -HUP
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+# See how we were called.
+case "$1" in
+    start|stop|restart|reload)
+        $1
+        ;;
+    status)
+        status $PROCESS
+        RETVAL=$?
+        ;;
+    force-reload)
+        reload
+	;;
+    condrestart|try-restart)
+        [ -f @localstatedir@/lock/subsys/$SERVICE ] && restart || :
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+	exit 1
+        ;;
+esac
+exit $RETVAL
