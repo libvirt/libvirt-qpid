@@ -78,6 +78,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 * Fri Sep 26 2008 Ian Main <imain@redhat.com - 0.1.2
 - Setup daemonization and init scripts.
+- Added getopt for command line parsing.
 
 * Fri Sep 19 2008 Ian Main <imain@redhat.com - 0.1.1
 - Initial packaging.
