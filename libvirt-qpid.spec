@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 AutoReq: no
-Version: 0.1.1
+Version: 0.1.2
 Release: 1
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -44,19 +44,19 @@ rm -rf %{buildroot}
 %makeinstall
 
 %post
-#/sbin/chkconfig --add libvirt-qpid
-#/sbin/service libvirt-qpid condrestart
+/sbin/chkconfig --add libvirt-qpid
+/sbin/service libvirt-qpid condrestart
 
 %preun
-#if [ $1 = 0 ]; then
-    #/sbin/service libvirt-qpid stop >/dev/null 2>&1 || :
-    #chkconfig --del libvirt-qpid
-#fi
+if [ $1 = 0 ]; then
+    /sbin/service libvirt-qpid stop >/dev/null 2>&1 || :
+    chkconfig --del libvirt-qpid
+fi
 
 %postun
-#if [ "$1" -ge "1" ]; then
-    #/sbin/service libvirt-qpid condrestart >/dev/null 2>&1 || :
-#fi
+if [ "$1" -ge "1" ]; then
+    /sbin/service libvirt-qpid condrestart >/dev/null 2>&1 || :
+fi
 
 %clean
 test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
@@ -68,14 +68,19 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 /usr/share/libvirt-qpid/libvirt-schema.xml
 
 %defattr(755,root,root)
-%{_bindir}/libvirt-qpid
+%{_sbindir}/libvirt-qpid
+%{_sysconfdir}/rc.d/init.d/libvirt-qpid
 
 %doc AUTHORS COPYING
 
 
 %changelog
 
+* Fri Sep 26 2008 Ian Main <imain@redhat.com - 0.1.2
+- Setup daemonization and init scripts.
+
 * Fri Sep 19 2008 Ian Main <imain@redhat.com - 0.1.1
 - Initial packaging.
+
 
 

@@ -2,7 +2,7 @@
 
 INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt
 
-bin_PROGRAMS = libvirt-qpid
+sbin_PROGRAMS = libvirt-qpid
 
 generated_file_list = \
 	qmf/com/redhat/libvirt/ArgsDomainMigrate.h \

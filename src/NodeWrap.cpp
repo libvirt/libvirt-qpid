@@ -2,6 +2,7 @@
 #include <string.h>
 #include <sys/select.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
@@ -395,6 +396,8 @@ int main(int argc, char** argv) {
     ManagementAgent::Singleton singleton;
     const char* host = argc>1 ? argv[1] : "127.0.0.1";
     int port = argc>2 ? atoi(argv[2]) : 5672;
+
+    daemon(0, 0);
 
     // Create the management agent
     ManagementAgent* agent = singleton.getInstance();
