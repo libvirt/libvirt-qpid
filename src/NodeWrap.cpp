@@ -3,6 +3,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
@@ -388,16 +389,56 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     return STATUS_NOT_IMPLEMENTED;
 }
 
+static void
+print_usage()
+{
+    printf("Usage:\tlibvirt-qpid [--daemon|--help|--server <hostname>|--port <port>]\n");
+    printf("\t-d | --daemon     run as a daemon.\n");
+    printf("\t-h | --help       print this help message.\n");
+    printf("\t-s | --server     specify server host name..\n");
+    printf("\t-p | --port       specify server port.\n");
+}
+
 
 //==============================================================
 // Main program
 //==============================================================
 int main(int argc, char** argv) {
     ManagementAgent::Singleton singleton;
-    const char* host = argc>1 ? argv[1] : "127.0.0.1";
-    int port = argc>2 ? atoi(argv[2]) : 5672;
+    int arg;
+    int idx = 0;
+    struct option opt[] = {
+        {"help", 0, 0, 'h'},
+        {"daemon", 0, 0, 'd'},
+        {"server", 1, 0, 's'},
+        {"port", 0, 0, 'p'},
+        {0, 0, 0, 0}
+    };
+    char *host = NULL;
+    int port = 5672;
 
-    daemon(0, 0);
+    while ((arg = getopt_long(argc, argv, "hds:p:", opt, &idx)) != -1) {
+        switch (arg) {
+            case 'h':
+                print_usage();
+                exit(0);
+                break;
+            case 'd':
+                daemon(0, 0);
+                break;
+            case 'p':
+                port = atoi(optarg);
+                break;
+            case 's':
+                host = strdup(optarg);
+                break;
+            default:
+                fprintf(stderr, "unsupported option '-%c'.  See --help.", arg);
+                print_usage();
+                exit(0);
+            break;
+        }
+    }
 
     // Create the management agent
     ManagementAgent* agent = singleton.getInstance();
@@ -410,7 +451,7 @@ int main(int argc, char** argv) {
     // updates to stats/properties to the broker.  The last is set to 'true'
     // to keep this all single threaded.  Otherwise a second thread would be
     // used to implement methods.
-    agent->init(string(host), port, 5, true);
+    agent->init(string(host ? host : "127.0.0.1"), port, 5, true);
 
     NodeWrap node(agent, "Libvirt Node");
 
