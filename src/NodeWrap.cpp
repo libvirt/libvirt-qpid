@@ -424,7 +424,10 @@ int main(int argc, char** argv) {
                 exit(0);
                 break;
             case 'd':
-                daemon(0, 0);
+                if (daemon(0, 0) < 0) {
+                    fprintf(stderr, "Error daemonizing: %s\n", strerror(errno));
+                    exit(1);
+                }
                 break;
             case 'p':
                 port = atoi(optarg);
