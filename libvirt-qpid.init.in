@@ -33,9 +33,11 @@ PROCESS=libvirt-qpid
 
 RETVAL=0
 
+test -f /etc/sysconfig/libvirt-qpid && . /etc/sysconfig/libvirt-qpid
+
 start() {
     echo -n $"Starting $SERVICE daemon: "
-    daemon --check $SERVICE $PROCESS --daemon
+    daemon --check $SERVICE $PROCESS --daemon $LIBVIRT_QPID_ARGS
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch @localstatedir@/lock/subsys/$SERVICE

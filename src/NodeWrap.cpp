@@ -395,8 +395,8 @@ print_usage()
     printf("Usage:\tlibvirt-qpid [--daemon|--help|--server <hostname>|--port <port>]\n");
     printf("\t-d | --daemon     run as a daemon.\n");
     printf("\t-h | --help       print this help message.\n");
-    printf("\t-s | --server     specify server host name..\n");
-    printf("\t-p | --port       specify server port.\n");
+    printf("\t-s | --broker     specify broker host name..\n");
+    printf("\t-p | --port       specify broker port.\n");
 }
 
 
@@ -410,14 +410,14 @@ int main(int argc, char** argv) {
     struct option opt[] = {
         {"help", 0, 0, 'h'},
         {"daemon", 0, 0, 'd'},
-        {"server", 1, 0, 's'},
+        {"broker", 1, 0, 'b'},
         {"port", 0, 0, 'p'},
         {0, 0, 0, 0}
     };
     char *host = NULL;
     int port = 5672;
 
-    while ((arg = getopt_long(argc, argv, "hds:p:", opt, &idx)) != -1) {
+    while ((arg = getopt_long(argc, argv, "hdb:p:", opt, &idx)) != -1) {
         switch (arg) {
             case 'h':
                 print_usage();
@@ -432,7 +432,7 @@ int main(int argc, char** argv) {
             case 'p':
                 port = atoi(optarg);
                 break;
-            case 's':
+            case 'b':
                 host = strdup(optarg);
                 break;
             default:
