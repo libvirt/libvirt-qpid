@@ -2,7 +2,7 @@ Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 AutoReq: no
 Version: 0.1.2
-Release: 3
+Release: 4
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
