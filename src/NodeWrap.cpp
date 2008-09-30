@@ -411,7 +411,7 @@ int main(int argc, char** argv) {
         {"help", 0, 0, 'h'},
         {"daemon", 0, 0, 'd'},
         {"broker", 1, 0, 'b'},
-        {"port", 0, 0, 'p'},
+        {"port", 1, 0, 'p'},
         {0, 0, 0, 0}
     };
     char *host = NULL;
@@ -420,6 +420,7 @@ int main(int argc, char** argv) {
     while ((arg = getopt_long(argc, argv, "hdb:p:", opt, &idx)) != -1) {
         switch (arg) {
             case 'h':
+            case '?':
                 print_usage();
                 exit(0);
                 break;
@@ -430,13 +431,23 @@ int main(int argc, char** argv) {
                 }
                 break;
             case 'p':
-                port = atoi(optarg);
+                if (optarg) {
+                    port = atoi(optarg);
+                } else {
+                    print_usage();
+                    exit(1);
+                }
                 break;
             case 'b':
-                host = strdup(optarg);
+                if (optarg) {
+                    host = strdup(optarg);
+                } else {
+                    print_usage();
+                    exit(1);
+                }
                 break;
             default:
-                fprintf(stderr, "unsupported option '-%c'.  See --help.", arg);
+                fprintf(stderr, "unsupported option '-%c'.  See --help.\n", arg);
                 print_usage();
                 exit(0);
             break;
