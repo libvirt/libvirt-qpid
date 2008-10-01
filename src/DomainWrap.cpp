@@ -10,12 +10,13 @@
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
-DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr domain_pointer,
-                         virConnectPtr connect)
+DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent,
+                       virDomainPtr _domain_ptr, virConnectPtr _conn) :
+                       domain_ptr(_domain_ptr), conn(_conn)
 {
     char dom_uuid[VIR_UUID_STRING_BUFLEN];
 
-    if (virDomainGetUUIDString(domain_pointer, dom_uuid) < 0) {
+    if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
         REPORT_ERR(conn, "DomainWrap: Unable to get UUID string of domain.");
         // FIXME: Not sure how to handle this one..
         return;
@@ -23,7 +24,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
 
     domain_uuid = dom_uuid;
 
-    const char *dom_name = virDomainGetName(domain_pointer);
+    const char *dom_name = virDomainGetName(domain_ptr);
     if (!dom_name) {
         REPORT_ERR(conn, "Unable to get domain name!\n");
         return;
@@ -33,8 +34,6 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent, virDomainPtr do
 
     domain = new _qmf::Domain(agent, this, parent, domain_uuid, domain_name);
     agent->addObject(domain);
-    conn = connect;
-    domain_ptr = domain_pointer;
 }
 
 DomainWrap::~DomainWrap()

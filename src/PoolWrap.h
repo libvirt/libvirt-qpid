@@ -31,8 +31,8 @@ class PoolWrap : public Manageable
     ManagementAgent *agent;
     qmf::com::redhat::libvirt::Pool *pool;
 
-    virConnectPtr conn;
     virStoragePoolPtr pool_ptr;
+    virConnectPtr conn;
 
     std::vector<VolumeWrap*> volumes;
 

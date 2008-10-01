@@ -130,6 +130,9 @@ void NodeWrap::syncDomains()
                 domains.push_back(domain);
             }
         }
+        for (int i = 0; i < maxname; i++) {
+            free(dnames[i]);
+        }
     }
 
     /* Go through all the active domains */
@@ -217,6 +220,7 @@ void NodeWrap::checkPool(char *pool_name)
     if (!pool_ptr) {
         REPORT_ERR(conn, "virStoragePoolLookupByName");
     } else {
+        printf("Creating new pool: %s, ptr is %p\n", pool_name, pool_ptr);
         PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
         printf("Created new pool: %s, ptr is %p\n", pool_name, pool_ptr);
         pools.push_back(pool);
@@ -241,6 +245,7 @@ void NodeWrap::syncPools()
 
         for (int i = 0; i < maxname; i++) {
             checkPool(names[i]);
+            free(names[i]);
         }
     }
 
@@ -258,6 +263,7 @@ void NodeWrap::syncPools()
 
         for (int i = 0; i < maxname; i++) {
             checkPool(names[i]);
+            free(names[i]);
         }
     }
 
@@ -288,7 +294,7 @@ void NodeWrap::doLoop()
      * information and statistics. */
     while (1) {
         int read_fd = agent->getSignalFd();
-        printf ("read ifd is %d\n", read_fd);
+        printf("read ifd is %d\n", read_fd);
 
         // FIXME: I think we should check the libvirt connection pointer here and if it's invalid
         // we should go about trying to reconnect instead of all this other stuff. 
@@ -303,7 +309,7 @@ void NodeWrap::doLoop()
 
         retval = select(read_fd + 1, &fds, NULL, NULL, &tv);
         if (retval < 0) {
-            fprintf (stderr, "Error in select loop: %s\n", strerror(errno));
+            fprintf(stderr, "Error in select loop: %s\n", strerror(errno));
             continue;
         }
 
@@ -404,14 +410,16 @@ print_usage()
 // Main program
 //==============================================================
 int main(int argc, char** argv) {
-    ManagementAgent::Singleton singleton;
     int arg;
     int idx = 0;
+    bool verbose = false;
+    bool daemonize = false;
     struct option opt[] = {
         {"help", 0, 0, 'h'},
         {"daemon", 0, 0, 'd'},
         {"broker", 1, 0, 'b'},
         {"port", 1, 0, 'p'},
+        {"verbose", 0, 0, 'v'},
         {0, 0, 0, 0}
     };
     char *host = NULL;
@@ -425,10 +433,10 @@ int main(int argc, char** argv) {
                 exit(0);
                 break;
             case 'd':
-                if (daemon(0, 0) < 0) {
-                    fprintf(stderr, "Error daemonizing: %s\n", strerror(errno));
-                    exit(1);
-                }
+                daemonize = true;
+                break;
+            case 'v':
+                verbose = true;
                 break;
             case 'p':
                 if (optarg) {
@@ -454,7 +462,15 @@ int main(int argc, char** argv) {
         }
     }
 
+    if (daemonize == true) {
+        if (daemon(0, 0) < 0) {
+            fprintf(stderr, "Error daemonizing: %s\n", strerror(errno));
+            exit(1);
+        }
+    }
+
     // Create the management agent
+    ManagementAgent::Singleton singleton;
     ManagementAgent* agent = singleton.getInstance();
 
     // Register the schema with the agent

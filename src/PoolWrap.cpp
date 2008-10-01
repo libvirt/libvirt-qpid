@@ -10,8 +10,9 @@
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
-PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
-                   virStoragePoolPtr pool_pointer, virConnectPtr connect)
+PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
+                   virStoragePoolPtr _pool_pointer, virConnectPtr _connect) :
+                   agent(_agent), pool_ptr(_pool_pointer), conn(_connect)
 {
     int ret;
     char pool_uuid_str[VIR_UUID_STRING_BUFLEN];
@@ -33,8 +34,6 @@ PoolWrap::PoolWrap(ManagementAgent *agent, NodeWrap *parent,
 
     pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name);
     agent->addObject(pool);
-    conn = connect;
-    pool_ptr = pool_pointer;
 }
 
 PoolWrap::~PoolWrap()
@@ -93,6 +92,10 @@ PoolWrap::syncVolumes()
         }
     }
 
+    for (i = 0; i < ret; i++) {
+        free(names[i]);
+    }
+
     /* Go through our list of volumes and ensure that they still exist. */
     for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
 
@@ -109,7 +112,7 @@ PoolWrap::syncVolumes()
     }
 
     /* And finally *phew*, call update() on all volumes. */
-    for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
+    for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end(); iter++) {
         (*iter)->update();
     }
 }

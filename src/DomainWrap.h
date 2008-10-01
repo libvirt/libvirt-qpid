@@ -28,8 +28,8 @@ class DomainWrap : public Manageable
     ManagementAgent *agent;
     qmf::com::redhat::libvirt::Domain *domain;
 
-    virConnectPtr conn;
     virDomainPtr domain_ptr;
+    virConnectPtr conn;
 
 public:
 

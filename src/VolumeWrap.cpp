@@ -12,14 +12,12 @@
 namespace _qmf = qmf::com::redhat::libvirt;
 
 VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent, 
-                       virStorageVolPtr volume_pointer, virConnectPtr connect)
+                       virStorageVolPtr _volume_ptr, virConnectPtr _conn) :
+                       conn(_conn), volume_ptr(_volume_ptr)
 {
     const char *volume_key_s;
     char *volume_path_s;
     const char *volume_name_s;
-
-    volume_ptr = volume_pointer;
-    conn = connect;
 
     volume_key_s = virStorageVolGetKey(volume_ptr);
     if (volume_key_s == NULL) {
@@ -43,7 +41,9 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
     volume_name = volume_name_s;
 
     volume = new _qmf::Volume(agent, this, parent, volume_key, volume_path, volume_name);
+    printf("adding volume to agent - volume %p\n", volume);
     agent->addObject(volume);
+    printf("done\n");
 }
 
 void
