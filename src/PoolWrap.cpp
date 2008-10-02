@@ -58,7 +58,8 @@ PoolWrap::syncVolumes()
         return;
     }
 
-    char *names[maxactive];
+    char **names;
+    names = (char **) malloc(sizeof(char *) * maxactive);
 
     ret = virStoragePoolListVolumes(pool_ptr, names, maxactive);
     if (ret < 0) {
@@ -95,6 +96,7 @@ PoolWrap::syncVolumes()
     for (i = 0; i < ret; i++) {
         free(names[i]);
     }
+    free(names);
 
     /* Go through our list of volumes and ensure that they still exist. */
     for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {

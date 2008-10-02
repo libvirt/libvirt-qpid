@@ -90,17 +90,18 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
 void NodeWrap::syncDomains()
 {
-
     /* Sync up with domains that are defined but not active. */
     int maxname = virConnectNumOfDefinedDomains(conn);
     if (maxname < 0) {
         REPORT_ERR(conn, "virConnectNumOfDefinedDomains");
         return;
     } else {
-        char *dnames[maxname];
+        char **dnames;
+        dnames = (char **) malloc(sizeof(char *) * maxname);
 
         if ((maxname = virConnectListDefinedDomains(conn, dnames, maxname)) < 0) {
             REPORT_ERR(conn, "virConnectListDefinedDomains");
+            free(dnames);
             return;
         }
 
@@ -133,6 +134,8 @@ void NodeWrap::syncDomains()
         for (int i = 0; i < maxname; i++) {
             free(dnames[i]);
         }
+
+        free(dnames);
     }
 
     /* Go through all the active domains */
@@ -141,7 +144,8 @@ void NodeWrap::syncDomains()
         REPORT_ERR(conn, "virConnectNumOfDomains");
         return;
     } else {
-        int ids[maxids];
+        int *ids;
+        ids = (int *) malloc(sizeof(int *) * maxids);
 
         if ((maxids = virConnectListDomains(conn, ids, maxids)) < 0) {
             printf("Error getting list of defined domains\n");
@@ -150,7 +154,7 @@ void NodeWrap::syncDomains()
 
         for (int i = 0; i < maxids; i++) {
             virDomainPtr domain_ptr;
-            char dom_uuid[VIR_UUID_BUFLEN];
+            char dom_uuid[VIR_UUID_STRING_BUFLEN];
 
             domain_ptr = virDomainLookupByID(conn, ids[i]);
             if (!domain_ptr) {
@@ -181,12 +185,14 @@ void NodeWrap::syncDomains()
             printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
             domains.push_back(domain);
         }
+
+        free(ids);
     }
 
     /* Go through our list of domains and ensure that they still exist. */
     for (std::vector<DomainWrap*>::iterator iter = domains.begin(); iter != domains.end();) {
 
-        printf ("verifying domain %s\n", (*iter)->domain_name.c_str());
+        printf("verifying domain %s\n", (*iter)->domain_name.c_str());
         virDomainPtr ptr = virDomainLookupByUUIDString(conn, (*iter)->domain_uuid.c_str());
         if (ptr == NULL) {
             REPORT_ERR(conn, "virDomainLookupByUUIDString");
@@ -236,7 +242,8 @@ void NodeWrap::syncPools()
         REPORT_ERR(conn, "virConnectNumOfStroagePools");
         return;
     } else {
-        char *names[maxname];
+        char **names;
+        names = (char **) malloc(sizeof(char *) * maxname);
 
         if ((maxname = virConnectListStoragePools(conn, names, maxname)) < 0) {
             REPORT_ERR(conn, "virConnectListStoragePools");
@@ -247,6 +254,7 @@ void NodeWrap::syncPools()
             checkPool(names[i]);
             free(names[i]);
         }
+        free(names);
     }
 
     maxname = virConnectNumOfDefinedStoragePools(conn);
@@ -254,7 +262,8 @@ void NodeWrap::syncPools()
         REPORT_ERR(conn, "virConnectNumOfDefinedStoragePools");
         return;
     } else {
-        char *names[maxname];
+        char **names;
+        names = (char **) malloc(sizeof(char *) * maxname);
 
         if ((maxname = virConnectListDefinedStoragePools(conn, names, maxname)) < 0) {
             REPORT_ERR(conn, "virConnectListDefinedStoragePools");
@@ -265,6 +274,8 @@ void NodeWrap::syncPools()
             checkPool(names[i]);
             free(names[i]);
         }
+
+        free(names);
     }
 
     /* Go through our list of pools and ensure that they still exist. */
