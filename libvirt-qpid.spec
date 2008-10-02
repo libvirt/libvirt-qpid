@@ -1,8 +1,8 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 AutoReq: no
-Version: 0.1.2
-Release: 4
+Version: 0.1.3
+Release: 5
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -74,6 +74,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Wed Oct 1 2008 Ian Main <imain@redhat.com - 0.1.3
+- Bugfixes, memory leaks fixed etc.
 
 * Tue Sep 30 2008 Ian Main <imain@redhat.com - 0.1.2
 - Updated spec to remove qpidd requirement.
