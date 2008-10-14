@@ -65,6 +65,8 @@ formatError(virConnectPtr conn, const char *msg, int *err_ret, const char *funct
     virErrorPtr err;
     std::ostringstream errmsg;
 
+    *err_ret = -1;
+
     if (!conn) {
         errmsg << "NULL connection: " << msg << " " << file << " " << function << " " << line;
         return errmsg.str();
@@ -72,10 +74,10 @@ formatError(virConnectPtr conn, const char *msg, int *err_ret, const char *funct
     err = virConnGetLastError(conn);
     if (!err) {
         errmsg << "NULL error handle: " << msg << " " << file << " " << function << " " << line;
-        *err_ret = err->code;
         return errmsg.str();
     }
 
+    *err_ret = err->code;
     errmsg << "Error: " << msg << " Subsystem " << getErrorSource(err) << ": ";
     errmsg << err->message;
     errmsg << " in " << file << ":" << function << ":" << line;

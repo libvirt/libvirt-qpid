@@ -44,7 +44,7 @@ class NodeWrap : public Manageable
 public:
 
     NodeWrap(ManagementAgent* agent, string _name);
-    ~NodeWrap() { mgmtObject->resourceDestroy(); }
+    ~NodeWrap();
 
     ManagementObject* GetManagementObject(void) const
     { return mgmtObject; }

@@ -1,8 +1,5 @@
 
-TODO: 
+TODO:
 
-- Need better reconnect/error handling for both qpid and libvirt.
-I think it should attempt to reconnect until successful whenever it
-gets disconnected.  We may need an extra status property for this state
-as well.
 - Make it less chatty to stdout.
+- Implement node info.

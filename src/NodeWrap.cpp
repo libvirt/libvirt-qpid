@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <syslog.h>
+#include <signal.h>
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
@@ -36,25 +37,25 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
     conn = virConnectOpen(NULL);
     if (!conn) {
         REPORT_ERR(conn, "virConnectOpen");
-        exit(1);
+        throw -1;
     }
 
     hostname = virConnectGetHostname(conn);
     if (hostname == NULL) {
         REPORT_ERR(conn, "virConnectGetHostname");
-        exit(1);
+        throw -1;
     }
 
     hv_type = virConnectGetType(conn);
     if (hv_type == NULL) {
         REPORT_ERR(conn, "virConnectGetType");
-        exit(1);
+        throw -1;
     }
 
     uri = virConnectGetURI(conn);
     if (uri == NULL) {
         REPORT_ERR(conn, "virConnectGetURI");
-        exit(1);
+        throw -1;
     }
 
     ret = virGetVersion(&libvirt_v, hv_type, &api_v);
@@ -87,6 +88,23 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
 
     mgmtObject = new _qmf::Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
     agent->addObject(mgmtObject);
+}
+
+NodeWrap::~NodeWrap()
+{
+    /* Go through our list of pools and destroy them all! MOOOHAHAHA */
+    for (std::vector<PoolWrap*>::iterator iter = pools.begin(); iter != pools.end();) {
+        delete (*iter);
+        iter = pools.erase(iter);
+    }
+
+    /* Same for domains.. */
+    for (std::vector<DomainWrap*>::iterator iter = domains.begin(); iter != domains.end();) {
+        delete (*iter);
+        iter = domains.erase(iter);
+    }
+
+    mgmtObject->resourceDestroy();
 }
 
 void NodeWrap::syncDomains()
@@ -306,10 +324,26 @@ void NodeWrap::doLoop()
      * information and statistics. */
     while (1) {
         int read_fd = agent->getSignalFd();
-        printf("read ifd is %d\n", read_fd);
 
-        // FIXME: I think we should check the libvirt connection pointer here and if it's invalid
-        // we should go about trying to reconnect instead of all this other stuff. 
+        // We're using this to check to see if our connection is still good.
+        // I don't see any reason this call should fail unless there is some
+        // connection problem..
+        int maxname = virConnectNumOfDefinedDomains(conn);
+        if (maxname < 0) {
+            return;
+        }
+
+        syncDomains();
+        syncPools();
+
+        for (std::vector<DomainWrap*>::iterator iter = domains.begin();
+                iter != domains.end(); iter++) {
+            (*iter)->update();
+        }
+        for (std::vector<PoolWrap*>::iterator iter = pools.begin();
+                iter != pools.end(); iter++) {
+            (*iter)->update();
+        }
 
         /* Poll agent fd.  If any methods are being made this FD will be ready for reading.  */
         FD_ZERO(&fds);
@@ -330,20 +364,6 @@ void NodeWrap::doLoop()
             agent->pollCallbacks();
         }
 
-        // FIXME: This could be a little smarter.. as it is it fires everytime a
-        // method is called.  This may be a good thing or it may need to be setup
-        // so it only runs every 5 seconds or such.
-        syncDomains();
-        syncPools();
-
-        for (std::vector<DomainWrap*>::iterator iter = domains.begin();
-                iter != domains.end(); iter++) {
-            (*iter)->update();
-        }
-        for (std::vector<PoolWrap*>::iterator iter = pools.begin();
-                iter != pools.end(); iter++) {
-            (*iter)->update();
-        }
     }
 }
 
@@ -483,6 +503,9 @@ int main(int argc, char** argv) {
     }
     openlog("libvirt-qpid", 0, LOG_DAEMON);
 
+    // This prevents us from dying if libvirt disconnects.
+    signal(SIGPIPE, SIG_IGN);
+
     // Create the management agent
     ManagementAgent::Singleton singleton;
     ManagementAgent* agent = singleton.getInstance();
@@ -497,9 +520,14 @@ int main(int argc, char** argv) {
     // used to implement methods.
     agent->init(string(host ? host : "127.0.0.1"), port, 5, true);
 
-    NodeWrap node(agent, "Libvirt Node");
-
-    node.doLoop();
+    while(true) {
+        try {
+            NodeWrap node(agent, "Libvirt Node");
+            node.doLoop();
+        } catch (int err) {
+        }
+        sleep(10);
+    }
 }
 
 

@@ -37,6 +37,12 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
 
 PoolWrap::~PoolWrap()
 {
+    // Destroy volumes..
+    for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
+        delete (*iter);
+        iter = volumes.erase(iter);
+    }
+
     pool->resourceDestroy();
     virStoragePoolFree(pool_ptr);
 }
