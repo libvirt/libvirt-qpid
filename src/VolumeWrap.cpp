@@ -7,7 +7,7 @@
 #include "VolumeWrap.h"
 #include "Error.h"
 
-#include "ArgsVolumeXml_desc.h"
+#include "ArgsVolumeGetXMLDesc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -75,9 +75,9 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {
-    case _qmf::Volume::METHOD_XML_DESC:
+    case _qmf::Volume::METHOD_GETXMLDESC:
         {
-            _qmf::ArgsVolumeXml_desc *io_args = (_qmf::ArgsVolumeXml_desc *) &args;
+            _qmf::ArgsVolumeGetXMLDesc *io_args = (_qmf::ArgsVolumeGetXMLDesc *) &args;
             char *desc;
 
             desc = virStorageVolGetXMLDesc(volume_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);

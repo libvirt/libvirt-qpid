@@ -10,27 +10,27 @@
   <class name="Node">
     <property name="hostname" type="sstr" access="RC" desc="Host name"/>
     <property name="uri" type="sstr" access="RC" desc="URI of libvirt"/>
-    <property name="libvirt_version" type="sstr" access="RC" desc="Version of libvirt on the managed node"/>
-    <property name="api_version" type="sstr" access="RC" desc="Version of libvirt API on the managed node"/>
-    <property name="hypervisor_version" type="sstr" access="RC" desc="Hypervisor Version"/>
-    <property name="hypervisor_type" type="sstr" access="RC" desc="Hypervisor type"/>
+    <property name="libvirtVersion" type="sstr" access="RC" desc="Version of libvirt on the managed node"/>
+    <property name="apiVersion" type="sstr" access="RC" desc="Version of libvirt API on the managed node"/>
+    <property name="hypervisorVersion" type="sstr" access="RC" desc="Hypervisor Version"/>
+    <property name="hypervisorType" type="sstr" access="RC" desc="Hypervisor type"/>
     
-    <method name="domain_define_xml" desc="Define a new domain, but does not start it.">
-      <arg name="xml_desc" dir="I" type="sstr" desc="XML domain description"/>
+    <method name="domainDefineXML" desc="Define a new domain, but does not start it.">
+      <arg name="xmlDesc" dir="I" type="sstr" desc="XML domain description"/>
 
       <arg name="domain" dir="O" type="objId" desc="Newly created domain object"/>
     </method>
    
-    <method name="storage_pool_define_xml" 
+    <method name="storagePoolDefineXML" 
      desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
-      <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
+      <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
       
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
     
-    <method name="storage_pool_create_xml" 
+    <method name="storagePoolCreateXML" 
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
-      <arg name="xml_desc" type="sstr" desc="XML Description of the storage pool"/>
+      <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
       
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
@@ -58,11 +58,11 @@
          and give us a reference here to the node object. -->
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this VM"/>
     
-    <statistic name="maximum_memory" type="uint64" desc="Maximum memory allowed in KB."/>
+    <statistic name="maximumMemory" type="uint64" desc="Maximum memory allowed in KB."/>
     <statistic name="memory" type="uint64" desc="Memory used in KB."/>
-    <statistic name="cpu_time" type="uint64" desc="CPU time used in nanoseconds."/>
+    <statistic name="cpuTime" type="uint64" desc="CPU time used in nanoseconds."/>
     <property name="state" type="sstr" desc="Domain state."/>
-    <property name="num_vcpus" type="uint32" desc="Number of virtual CPUs."/>
+    <property name="numVcpus" type="uint32" desc="Number of virtual CPUs."/>
     <property name="active" type="sstr" desc="true/false domain active."/>
 
     <method name="create" desc="Start stopped VM"/>
@@ -87,7 +87,7 @@
 
     <method name="reboot" desc="Reboot VM"/>
     
-    <method name="xml_desc" desc="Return an XML description of the domain.">
+    <method name="getXMLDesc" desc="Return an XML description of the domain.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the domain."/>
     </method>
     
@@ -95,7 +95,7 @@
     <method name="migrate" desc="Migrate this VM to another host">
       <arg name="destination_node" dir="I" type="objId" desc="Object representing destination host."/>
       <arg name="flags" dir="I" type="uint32" desc="Flags for migration, see documentation for details."/>
-      <arg name="new_domain_name" dir="I" type="sstr" desc="New domain name on new host if applicable."/>
+      <arg name="newDomainName" dir="I" type="sstr" desc="New domain name on new host if applicable."/>
       <arg name="uri" dir="I" type="sstr" desc="Destination hostname/URI as seen from host."/>
       <arg name="bandwidth" dir="I" type="uint32" desc="Maximum bandwidth to consume in Mbps."/>
       
@@ -116,7 +116,7 @@
          and give us a reference here to the node. -->
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>
     
-    <method name="xml_desc" desc="Return an XML description of the storage pool.">
+    <method name="getXMLDesc" desc="Return an XML description of the storage pool.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the storage pool."/>
     </method>
     
@@ -129,9 +129,9 @@
     <method name="delete" desc="Destroy the pool and delete its definition">
     </method>
     
-    <method name="create_volume_xml" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
+    <method name="createVolumeXML" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
 
-      <arg name="xml_desc" type="sstr" desc="XML Description of the volume to create"/>
+      <arg name="xmlDesc" type="sstr" desc="XML Description of the volume to create"/>
       
       <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
     </method>
@@ -145,10 +145,10 @@
     <property name="capacity" type="uint64" desc="Capacity of storage volume in bytes"/>
     <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
 
-    <property name="storage_pool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
+    <property name="storagePool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
      desc="Pool where this storage volume exists"/>
 
-    <method name="xml_desc" desc="Return an XML description of the volume.">
+    <method name="getXMLDesc" desc="Return an XML description of the volume.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the volume."/>
     </method>
   </class>

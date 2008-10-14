@@ -10,9 +10,9 @@
 #include "PoolWrap.h"
 #include "Error.h"
 
-#include "ArgsNodeDomain_define_xml.h"
-#include "ArgsNodeStorage_pool_create_xml.h"
-#include "ArgsNodeStorage_pool_define_xml.h"
+#include "ArgsNodeDomainDefineXML.h"
+#include "ArgsNodeStoragePoolCreateXML.h"
+#include "ArgsNodeStoragePoolDefineXML.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -353,10 +353,10 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     cout << "Method Received: " << methodId << endl;
 
     switch (methodId) {
-        case _qmf::Node::METHOD_DOMAIN_DEFINE_XML:
+        case _qmf::Node::METHOD_DOMAINDEFINEXML:
         {
-            _qmf::ArgsNodeDomain_define_xml *io_args = (_qmf::ArgsNodeDomain_define_xml *) &args;
-            domain_ptr = virDomainDefineXML(conn, io_args->i_xml_desc.c_str());
+            _qmf::ArgsNodeDomainDefineXML *io_args = (_qmf::ArgsNodeDomainDefineXML *) &args;
+            domain_ptr = virDomainDefineXML(conn, io_args->i_xmlDesc.c_str());
             if (!domain_ptr) {
                 //REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
                 errstr = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
@@ -368,12 +368,12 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
         }
 
-        case _qmf::Node::METHOD_STORAGE_POOL_DEFINE_XML:
+        case _qmf::Node::METHOD_STORAGEPOOLDEFINEXML:
         {
-            _qmf::ArgsNodeStorage_pool_define_xml *io_args = (_qmf::ArgsNodeStorage_pool_define_xml *) &args;
+            _qmf::ArgsNodeStoragePoolDefineXML *io_args = (_qmf::ArgsNodeStoragePoolDefineXML *) &args;
             virStoragePoolPtr pool_ptr;
 
-            pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xml_desc.c_str(), 0);
+            pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xmlDesc.c_str(), 0);
             if (pool_ptr == NULL) {
                 errstr = FORMAT_ERR(conn, "Error defining storage pool using xml description (virStoragePoolDefineXML).");
                 return STATUS_USER;
@@ -385,12 +385,12 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
 
         }
-        case _qmf::Node::METHOD_STORAGE_POOL_CREATE_XML:
+        case _qmf::Node::METHOD_STORAGEPOOLCREATEXML:
         {
-            _qmf::ArgsNodeStorage_pool_create_xml *io_args = (_qmf::ArgsNodeStorage_pool_create_xml *) &args;
+            _qmf::ArgsNodeStoragePoolCreateXML *io_args = (_qmf::ArgsNodeStoragePoolCreateXML *) &args;
             virStoragePoolPtr pool_ptr;
 
-            pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xml_desc.c_str(), 0);
+            pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xmlDesc.c_str(), 0);
             if (pool_ptr == NULL) {
                 errstr = FORMAT_ERR(conn, "Error creating storage pool using xml description (virStoragePoolCreateXML).");
                 return STATUS_USER;

@@ -4,9 +4,9 @@
 #include "VolumeWrap.h"
 #include "Error.h"
 
-#include "ArgsPoolCreate_volume_xml.h"
-#include "ArgsPoolXml_desc.h"
-#include "ArgsVolumeXml_desc.h"
+#include "ArgsPoolCreateVolumeXML.h"
+#include "ArgsPoolGetXMLDesc.h"
+//#include "ArgsVolumeGetXmlDesc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -48,55 +48,66 @@ PoolWrap::syncVolumes()
     int maxactive;
     int ret;
     int i;
+    virStoragePoolInfo info;
 
     cout << "Syncing volumes.\n";
-
-    maxactive = virStoragePoolNumOfVolumes(pool_ptr);
-    if (maxactive < 0) {
-        //vshError(ctl, FALSE, "%s", _("Failed to list active vols"));
-        REPORT_ERR(conn, "error getting number of volumes in pool\n");
-        return;
-    }
-
-    char **names;
-    names = (char **) malloc(sizeof(char *) * maxactive);
-
-    ret = virStoragePoolListVolumes(pool_ptr, names, maxactive);
+    
+    ret = virStoragePoolGetInfo(pool_ptr, &info);
     if (ret < 0) {
-        REPORT_ERR(conn, "error getting list of volumes\n");
+        REPORT_ERR(conn, "PoolWrap: Unable to get info of storage pool");
         return;
     }
 
-    for (i = 0; i < ret; i++) {
-        virStorageVolPtr vol_ptr;
-        bool found = false;
-        char *volume_name = names[i];
+    // Only try to list volumes if the storage pool is active.
+    if (info.state != VIR_STORAGE_POOL_INACTIVE) {
 
-        for (std::vector<VolumeWrap*>::iterator iter = volumes.begin();
-             iter != volumes.end(); iter++) {
-            if ((*iter)->volume_name == volume_name) {
-                found = true;
-                break;
+        maxactive = virStoragePoolNumOfVolumes(pool_ptr);
+        if (maxactive < 0) {
+            //vshError(ctl, FALSE, "%s", _("Failed to list active vols"));
+            REPORT_ERR(conn, "error getting number of volumes in pool\n");
+            return;
+        }
+
+        char **names;
+        names = (char **) malloc(sizeof(char *) * maxactive);
+
+        ret = virStoragePoolListVolumes(pool_ptr, names, maxactive);
+        if (ret < 0) {
+            REPORT_ERR(conn, "error getting list of volumes\n");
+            return;
+        }
+
+        for (i = 0; i < ret; i++) {
+            virStorageVolPtr vol_ptr;
+            bool found = false;
+            char *volume_name = names[i];
+
+            for (std::vector<VolumeWrap*>::iterator iter = volumes.begin();
+                 iter != volumes.end(); iter++) {
+                if ((*iter)->volume_name == volume_name) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                vol_ptr = virStorageVolLookupByName(pool_ptr, volume_name);
+                if (vol_ptr == NULL) {
+                    REPORT_ERR(conn, "error looking up storage volume by name\n");
+                    continue;
+                }
+
+                VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
+                printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
+                volumes.push_back(volume);
             }
         }
 
-        if (!found) {
-            vol_ptr = virStorageVolLookupByName(pool_ptr, volume_name);
-            if (vol_ptr == NULL) {
-                REPORT_ERR(conn, "error looking up storage volume by name\n");
-                continue;
-            }
-
-            VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
-            printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
-            volumes.push_back(volume);
+        for (i = 0; i < ret; i++) {
+            free(names[i]);
         }
+        free(names);
     }
-
-    for (i = 0; i < ret; i++) {
-        free(names[i]);
-    }
-    free(names);
 
     /* Go through our list of volumes and ensure that they still exist. */
     for (std::vector<VolumeWrap*>::iterator iter = volumes.begin(); iter != volumes.end();) {
@@ -160,9 +171,9 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
     int ret;
 
     switch (methodId) {
-        case _qmf::Pool::METHOD_XML_DESC:
+        case _qmf::Pool::METHOD_GETXMLDESC:
         {
-            _qmf::ArgsPoolXml_desc *ioArgs = (_qmf::ArgsPoolXml_desc *) &args;
+            _qmf::ArgsPoolGetXMLDesc *ioArgs = (_qmf::ArgsPoolGetXMLDesc *) &args;
             char *desc;
 
             desc = virStoragePoolGetXMLDesc(pool_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
@@ -205,13 +216,13 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
-        case _qmf::Pool::METHOD_CREATE_VOLUME_XML:
+        case _qmf::Pool::METHOD_CREATEVOLUMEXML:
         {
             qpid::framing::Buffer buffer;
-            _qmf::ArgsPoolCreate_volume_xml *io_args = (_qmf::ArgsPoolCreate_volume_xml *) &args;
+            _qmf::ArgsPoolCreateVolumeXML *io_args = (_qmf::ArgsPoolCreateVolumeXML *) &args;
             virStorageVolPtr volume_ptr;
 
-            volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xml_desc.c_str(), 0);
+            volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xmlDesc.c_str(), 0);
             if (volume_ptr == NULL) { 
                 errstr = FORMAT_ERR(conn, "Error creating new storage volume from XML description (virStorageVolCreateXML).");
                 return STATUS_USER;

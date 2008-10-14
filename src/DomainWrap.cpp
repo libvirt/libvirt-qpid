@@ -6,7 +6,7 @@
 #include "ArgsDomainMigrate.h"
 #include "ArgsDomainRestore.h"
 #include "ArgsDomainSave.h"
-#include "ArgsDomainXml_desc.h"
+#include "ArgsDomainGetXMLDesc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -81,10 +81,10 @@ DomainWrap::update()
                 break;
         }
 
-        domain->set_num_vcpus(info.nrVirtCpu);
-        domain->set_maximum_memory(info.maxMem);
+        domain->set_numVcpus(info.nrVirtCpu);
+        domain->set_maximumMemory(info.maxMem);
         domain->set_memory(info.memory);
-        domain->set_cpu_time(info.cpuTime);
+        domain->set_cpuTime(info.cpuTime);
     }
 
     ret = virDomainGetID(domain_ptr);
@@ -196,9 +196,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
 
-        case _qmf::Domain::METHOD_XML_DESC:
+        case _qmf::Domain::METHOD_GETXMLDESC:
             {
-                _qmf::ArgsDomainXml_desc *ioArgs = (_qmf::ArgsDomainXml_desc *) &args;
+                _qmf::ArgsDomainGetXMLDesc *ioArgs = (_qmf::ArgsDomainGetXMLDesc *) &args;
                 char *desc;
                 desc = virDomainGetXMLDesc(domain_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
                 if (desc) {

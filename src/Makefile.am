@@ -5,27 +5,27 @@ INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt
 sbin_PROGRAMS = libvirt-qpid
 
 generated_file_list = \
-	qmf/com/redhat/libvirt/ArgsDomainMigrate.h \
-	qmf/com/redhat/libvirt/ArgsDomainRestore.h \
-	qmf/com/redhat/libvirt/ArgsDomainSave.h \
-	qmf/com/redhat/libvirt/ArgsDomainXml_desc.h \
-	qmf/com/redhat/libvirt/ArgsNodeDomain_define_xml.h \
-	qmf/com/redhat/libvirt/ArgsNodeStorage_pool_create_xml.h \
-	qmf/com/redhat/libvirt/ArgsNodeStorage_pool_define_xml.h \
-	qmf/com/redhat/libvirt/ArgsPoolCreate_volume_xml.h \
-	qmf/com/redhat/libvirt/ArgsPoolXml_desc.h \
-	qmf/com/redhat/libvirt/ArgsVolumeXml_desc.h \
-	qmf/com/redhat/libvirt/Domain.cpp \
-	qmf/com/redhat/libvirt/Domain.h \
-	qmf/com/redhat/libvirt/Node.cpp \
-	qmf/com/redhat/libvirt/Node.h \
-	qmf/com/redhat/libvirt/NodeInfo.cpp \
-	qmf/com/redhat/libvirt/NodeInfo.h \
-	qmf/com/redhat/libvirt/Package.cpp \
-	qmf/com/redhat/libvirt/Package.h \
-	qmf/com/redhat/libvirt/Pool.cpp \
-	qmf/com/redhat/libvirt/Pool.h \
-	qmf/com/redhat/libvirt/Volume.cpp \
+	qmf/com/redhat/libvirt/Domain.cpp\
+	qmf/com/redhat/libvirt/Node.cpp\
+	qmf/com/redhat/libvirt/NodeInfo.cpp\
+	qmf/com/redhat/libvirt/Package.cpp\
+	qmf/com/redhat/libvirt/Pool.cpp\
+	qmf/com/redhat/libvirt/Volume.cpp\
+	qmf/com/redhat/libvirt/ArgsDomainGetXMLDesc.h\
+	qmf/com/redhat/libvirt/ArgsDomainMigrate.h\
+	qmf/com/redhat/libvirt/ArgsDomainRestore.h\
+	qmf/com/redhat/libvirt/ArgsDomainSave.h\
+	qmf/com/redhat/libvirt/ArgsNodeDomainDefineXML.h\
+	qmf/com/redhat/libvirt/ArgsNodeStoragePoolCreateXML.h\
+	qmf/com/redhat/libvirt/ArgsNodeStoragePoolDefineXML.h\
+	qmf/com/redhat/libvirt/ArgsPoolCreateVolumeXML.h\
+	qmf/com/redhat/libvirt/ArgsPoolGetXMLDesc.h\
+	qmf/com/redhat/libvirt/ArgsVolumeGetXMLDesc.h\
+	qmf/com/redhat/libvirt/Domain.h\
+	qmf/com/redhat/libvirt/Node.h\
+	qmf/com/redhat/libvirt/NodeInfo.h\
+	qmf/com/redhat/libvirt/Package.h\
+	qmf/com/redhat/libvirt/Pool.h\
 	qmf/com/redhat/libvirt/Volume.h
 
 nodist_libvirt_qpid_SOURCES = $(generated_file_list)
