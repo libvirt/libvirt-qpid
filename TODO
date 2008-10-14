@@ -1,12 +1,8 @@
 
 TODO: 
 
-- Not sure on camel case or underscores.  Original libvirt API uses
-camel case, I went with underscores as I was originally basing it off
-the ruby bindings.
 - Need better reconnect/error handling for both qpid and libvirt.
 I think it should attempt to reconnect until successful whenever it
 gets disconnected.  We may need an extra status property for this state
 as well.
-- Return libvirt error codes?
-- Make it less chatty, but log stuff to syslog.
+- Make it less chatty to stdout.

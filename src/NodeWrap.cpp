@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <syslog.h>
 
 #include "NodeWrap.h"
 #include "DomainWrap.h"
@@ -480,6 +481,7 @@ int main(int argc, char** argv) {
             exit(1);
         }
     }
+    openlog("libvirt-qpid", 0, LOG_DAEMON);
 
     // Create the management agent
     ManagementAgent::Singleton singleton;

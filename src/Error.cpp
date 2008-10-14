@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <syslog.h>
 
 #include "Error.h"
 
@@ -90,6 +91,8 @@ reportError(virConnectPtr conn, const char *msg, const char *function, int line,
 
     err = formatError(conn, msg, &err_ret, function, line, file);
     std::cout << "\n" << err << " code: " << err_ret << "\n";
+
+    syslog(LOG_ERR, "%s code: %d", err.c_str(), err_ret);
 }
 
 
