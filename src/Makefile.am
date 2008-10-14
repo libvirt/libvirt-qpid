@@ -7,7 +7,6 @@ sbin_PROGRAMS = libvirt-qpid
 generated_file_list = \
 	qmf/com/redhat/libvirt/Domain.cpp\
 	qmf/com/redhat/libvirt/Node.cpp\
-	qmf/com/redhat/libvirt/NodeInfo.cpp\
 	qmf/com/redhat/libvirt/Package.cpp\
 	qmf/com/redhat/libvirt/Pool.cpp\
 	qmf/com/redhat/libvirt/Volume.cpp\
@@ -23,7 +22,6 @@ generated_file_list = \
 	qmf/com/redhat/libvirt/ArgsVolumeGetXMLDesc.h\
 	qmf/com/redhat/libvirt/Domain.h\
 	qmf/com/redhat/libvirt/Node.h\
-	qmf/com/redhat/libvirt/NodeInfo.h\
 	qmf/com/redhat/libvirt/Package.h\
 	qmf/com/redhat/libvirt/Pool.h\
 	qmf/com/redhat/libvirt/Volume.h

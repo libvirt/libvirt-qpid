@@ -20,6 +20,7 @@ namespace _qmf = qmf::com::redhat::libvirt;
 
 NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_agent)
 {
+    virNodeInfo info;
     char *hostname;
     char libvirt_version[256] = "Unknown";
     char api_version[256] = "Unknown";
@@ -86,7 +87,15 @@ NodeWrap::NodeWrap(ManagementAgent* _agent, string _name) : name(_name), agent(_
         snprintf(hv_version, sizeof(hv_version), "%d.%d.%d", major, minor, rel);
     }
 
-    mgmtObject = new _qmf::Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type);
+    ret = virNodeGetInfo(conn, &info);
+    if (ret < 0) {
+        REPORT_ERR(conn, "virNodeGetInfo");
+        memset((void *) &info, sizeof(info), 1);
+    }
+
+    mgmtObject = new _qmf::Node(agent, this, hostname, uri, libvirt_version, api_version, hv_version, hv_type,
+                                info.model, info.memory, info.cpus, info.mhz, info.nodes, info.sockets,
+                                info.cores, info.threads);
     agent->addObject(mgmtObject);
 }
 

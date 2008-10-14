@@ -15,6 +15,15 @@
     <property name="hypervisorVersion" type="sstr" access="RC" desc="Hypervisor Version"/>
     <property name="hypervisorType" type="sstr" access="RC" desc="Hypervisor type"/>
 
+    <property name="model" type="sstr" access="RC" desc="CPU Model"/>
+    <property name="memory" type="uint64" access="RC" desc="Host memory"/>
+    <property name="cpus" type="uint32" access="RC" desc="Number of CPUS"/>
+    <property name="mhz" type="uint32" access="RC" desc="MHz of CPUs"/>
+    <property name="nodes" type="uint32" access="RC" desc="Number of NUMA cells."/>
+    <property name="sockets" type="uint32" access="RC" desc="Number of CPU Sockets per node"/>
+    <property name="cores" type="uint32" access="RC" desc="Number of cores per socket"/>
+    <property name="threads" type="uint32" access="RC" desc="Number of threads per core"/>
+
     <method name="domainDefineXML" desc="Define a new domain, but does not start it.">
       <arg name="xmlDesc" dir="I" type="sstr" desc="XML domain description"/>
 
@@ -34,18 +43,6 @@
 
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
-  </class>
-
-  <!-- Mapped in from the 'Node' class. -->
-  <class name="NodeInfo">
-    <property name="model" type="sstr"/>
-    <property name="memory" type="uint64"/>
-    <property name="cpus" type="uint32"/>
-    <property name="mhz" type="uint32"/>
-    <property name="nodes" type="uint32"/>
-    <property name="sockets" type="uint32"/>
-    <property name="cores" type="uint32"/>
-    <property name="threads" type="uint32"/>
   </class>
 
   <class name="Domain">
