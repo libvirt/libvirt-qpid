@@ -109,8 +109,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainCreate(domain_ptr);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error creating new domain (virDomainCreate).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error creating new domain (virDomainCreate).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
 
@@ -118,8 +118,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainDestroy(domain_ptr);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error destroying domain (virDomainDestroy).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error destroying domain (virDomainDestroy).", &ret);
+                return STATUS_USER + ret;
             }
 
             return STATUS_OK;
@@ -128,8 +128,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainUndefine(domain_ptr);
 
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error undefining domain (virDomainUndefine).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error undefining domain (virDomainUndefine).", &ret);
+                return STATUS_USER + ret;
             }
 
             /* We now wait for domainSync() to clean this up. */
@@ -139,8 +139,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainSuspend(domain_ptr);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error suspending domain (virDomainSuspend).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error suspending domain (virDomainSuspend).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
 
@@ -148,8 +148,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainResume(domain_ptr);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error resuming domain (virDomainResume).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error resuming domain (virDomainResume).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
 
@@ -159,8 +159,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
                 ret = virDomainSave(domain_ptr, ioArgs->i_filename.c_str());
                 if (ret < 0) {
-                    errstr = FORMAT_ERR(conn, "Error saving domain (virDomainSave).");
-                    return STATUS_USER;
+                    errstr = FORMAT_ERR(conn, "Error saving domain (virDomainSave).", &ret);
+                    return STATUS_USER + ret;
                 }
                 return STATUS_OK;
             }
@@ -172,8 +172,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 ret = virDomainRestore(conn, ioArgs->i_filename.c_str());
                 update();
                 if (ret < 0) {
-                    errstr = FORMAT_ERR(conn, "Error restoring domain (virDomainRestore).");
-                    return STATUS_USER;
+                    errstr = FORMAT_ERR(conn, "Error restoring domain (virDomainRestore).", &ret);
+                    return STATUS_USER + ret;
                 }
                 return STATUS_OK;
             }
@@ -182,8 +182,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainShutdown(domain_ptr);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error shutting down domain (virDomainShutdown).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error shutting down domain (virDomainShutdown).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
 
@@ -191,8 +191,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             ret = virDomainReboot(domain_ptr, 0);
             update();
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error rebooting domain (virDomainReboot).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error rebooting domain (virDomainReboot).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
 
@@ -204,8 +204,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 if (desc) {
                     ioArgs->o_description = desc;
                 } else {
-                    errstr = FORMAT_ERR(conn, "Error getting XML description of domain(virDomainGetXMLDesc).");
-                    return STATUS_USER;
+                    errstr = FORMAT_ERR(conn, "Error getting XML description of domain(virDomainGetXMLDesc).", &ret);
+                    return STATUS_USER + ret;
                 }
                 return STATUS_OK;
             }

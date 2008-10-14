@@ -73,6 +73,7 @@ Manageable::status_t
 VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     cout << "Method Received: " << methodId << endl;
+    int ret;
 
     switch (methodId) {
     case _qmf::Volume::METHOD_GETXMLDESC:
@@ -84,8 +85,8 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             if (desc) {
                 io_args->o_description = desc;
             } else {
-                errstr = FORMAT_ERR(conn, "Error getting xml description for volume (virStorageVolGetXMLDesc).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error getting xml description for volume (virStorageVolGetXMLDesc).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
         }

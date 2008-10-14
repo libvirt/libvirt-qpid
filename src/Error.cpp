@@ -58,9 +58,8 @@ getErrorSource(virErrorPtr err)
 }
 
 
-
 std::string
-formatError(virConnectPtr conn, const char *msg, const char *function, int line, const char *file)
+formatError(virConnectPtr conn, const char *msg, int *err_ret, const char *function, int line, const char *file)
 {
     virErrorPtr err;
     std::ostringstream errmsg;
@@ -72,6 +71,7 @@ formatError(virConnectPtr conn, const char *msg, const char *function, int line,
     err = virConnGetLastError(conn);
     if (!err) {
         errmsg << "NULL error handle: " << msg << " " << file << " " << function << " " << line;
+        *err_ret = err->code;
         return errmsg.str();
     }
 
@@ -86,9 +86,10 @@ void
 reportError(virConnectPtr conn, const char *msg, const char *function, int line, const char *file)
 {
     std::string err;
+    int err_ret;
 
-    err = formatError(conn, msg, function, line, file);
-    std::cout << "\n" << err << "\n";
+    err = formatError(conn, msg, &err_ret, function, line, file);
+    std::cout << "\n" << err << " code: " << err_ret << "\n";
 }
 
 

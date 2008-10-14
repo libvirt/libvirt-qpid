@@ -179,8 +179,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             if (desc) {
                 ioArgs->o_description = desc;
             } else {
-                errstr = FORMAT_ERR(conn, "Error getting XML description of storage pool (virStoragePoolGetXMLDesc).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error getting XML description of storage pool (virStoragePoolGetXMLDesc).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
         }
@@ -189,8 +189,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
         {
             ret = virStoragePoolCreate(pool_ptr, 0);
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error creating new storage pool (virStoragePoolCreate).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error creating new storage pool (virStoragePoolCreate).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
         }
@@ -199,8 +199,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
         {
             ret = virStoragePoolDestroy(pool_ptr);
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error destroying storage pool (virStoragePoolDestroy).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error destroying storage pool (virStoragePoolDestroy).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
         }
@@ -209,8 +209,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
         {
             ret = virStoragePoolDelete(pool_ptr, 0);
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error deleting storage pool (virStoragePoolDelete).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error deleting storage pool (virStoragePoolDelete).", &ret);
+                return STATUS_USER + ret;
             }
             return STATUS_OK;
         }
@@ -223,8 +223,8 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xmlDesc.c_str(), 0);
             if (volume_ptr == NULL) {
-                errstr = FORMAT_ERR(conn, "Error creating new storage volume from XML description (virStorageVolCreateXML).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error creating new storage volume from XML description (virStorageVolCreateXML).", &ret);
+                return STATUS_USER + ret;
             }
 
             VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);

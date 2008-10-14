@@ -351,6 +351,7 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 {
     virDomainPtr domain_ptr;
     cout << "Method Received: " << methodId << endl;
+    int ret;
 
     switch (methodId) {
         case _qmf::Node::METHOD_DOMAINDEFINEXML:
@@ -359,8 +360,8 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             domain_ptr = virDomainDefineXML(conn, io_args->i_xmlDesc.c_str());
             if (!domain_ptr) {
                 //REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
-                errstr = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).", &ret);
+                return STATUS_USER + ret;
             } else {
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 io_args->o_domain = domain->GetManagementObject()->getObjectId();
@@ -375,8 +376,8 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
             pool_ptr = virStoragePoolDefineXML (conn, io_args->i_xmlDesc.c_str(), 0);
             if (pool_ptr == NULL) {
-                errstr = FORMAT_ERR(conn, "Error defining storage pool using xml description (virStoragePoolDefineXML).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error defining storage pool using xml description (virStoragePoolDefineXML).", &ret);
+                return STATUS_USER + ret;
             }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
@@ -392,8 +393,8 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
             pool_ptr = virStoragePoolCreateXML (conn, io_args->i_xmlDesc.c_str(), 0);
             if (pool_ptr == NULL) {
-                errstr = FORMAT_ERR(conn, "Error creating storage pool using xml description (virStoragePoolCreateXML).");
-                return STATUS_USER;
+                errstr = FORMAT_ERR(conn, "Error creating storage pool using xml description (virStoragePoolCreateXML).", &ret);
+                return STATUS_USER + ret;
             }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
