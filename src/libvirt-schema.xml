@@ -14,24 +14,24 @@
     <property name="apiVersion" type="sstr" access="RC" desc="Version of libvirt API on the managed node"/>
     <property name="hypervisorVersion" type="sstr" access="RC" desc="Hypervisor Version"/>
     <property name="hypervisorType" type="sstr" access="RC" desc="Hypervisor type"/>
-    
+
     <method name="domainDefineXML" desc="Define a new domain, but does not start it.">
       <arg name="xmlDesc" dir="I" type="sstr" desc="XML domain description"/>
 
       <arg name="domain" dir="O" type="objId" desc="Newly created domain object"/>
     </method>
-   
-    <method name="storagePoolDefineXML" 
+
+    <method name="storagePoolDefineXML"
      desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
       <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
-      
+
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
-    
-    <method name="storagePoolCreateXML" 
+
+    <method name="storagePoolCreateXML"
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
       <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
-      
+
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
   </class>
@@ -51,13 +51,12 @@
   <class name="Domain">
     <property name="uuid" access="RC" type="sstr" desc="Domain UUID"/>
     <property name="name" access="RC" type="sstr" desc="Domain name"/>
-    <!-- FIXME: Should be int64 but it's broken atm -->
-    <property name="id" type="uint64" desc="Hypervisor Domain id, -1 if not running."/>
-    
+    <property name="id" type="int64" desc="Hypervisor Domain id, -1 if not running."/>
+
     <!-- Set up an association of hosts to VMs.  This will setup a domain list in the node object
          and give us a reference here to the node object. -->
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this VM"/>
-    
+
     <statistic name="maximumMemory" type="uint64" desc="Maximum memory allowed in KB."/>
     <statistic name="memory" type="uint64" desc="Memory used in KB."/>
     <statistic name="cpuTime" type="uint64" desc="CPU time used in nanoseconds."/>
@@ -66,11 +65,11 @@
     <property name="active" type="sstr" desc="true/false domain active."/>
 
     <method name="create" desc="Start stopped VM"/>
-    
+
     <method name="destroy" desc="Stop this VM"/>
-    
+
     <method name="undefine" desc="Undefine the domain"/>
-    
+
     <method name="suspend" desc="Suspend this VM"/>
 
     <method name="resume" desc="Resume suspended VM"/>
@@ -78,27 +77,27 @@
     <method name="save" desc="Save this VM">
       <arg name="filename" type="sstr" desc="Name of file to save VM image in"/>
     </method>
-    
+
     <method name="restore" desc="Restore saved VM">
       <arg name="filename" type="sstr" desc="Name of file to restore from"/>
     </method>
-    
+
     <method name="shutdown" desc="Shutdown a VM"/>
 
     <method name="reboot" desc="Reboot VM"/>
-    
+
     <method name="getXMLDesc" desc="Return an XML description of the domain.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the domain."/>
     </method>
-    
-    
+
+
     <method name="migrate" desc="Migrate this VM to another host">
       <arg name="destination_node" dir="I" type="objId" desc="Object representing destination host."/>
       <arg name="flags" dir="I" type="uint32" desc="Flags for migration, see documentation for details."/>
       <arg name="newDomainName" dir="I" type="sstr" desc="New domain name on new host if applicable."/>
       <arg name="uri" dir="I" type="sstr" desc="Destination hostname/URI as seen from host."/>
       <arg name="bandwidth" dir="I" type="uint32" desc="Maximum bandwidth to consume in Mbps."/>
-      
+
       <arg name="domain" dir="O" type="objId" desc="New VM object on new host"/>
     </method>
   </class>
@@ -106,37 +105,37 @@
   <class name="Pool">
     <property name="uuid" access="RC" type="sstr" desc="Pool UUID"/>
     <property name="name" access="RC" type="sstr" desc="Pool name"/>
-    
+
     <property name="state" type="sstr" desc="Pool state"/>
     <property name="capacity" type="uint64" desc="Pool size in bytes"/>
     <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
     <property name="available" type="uint64" desc="Available space in bytes"/>
-    
+
     <!-- Set up an association of hosts to storage pools.  This will setup a list of pools in the node object
          and give us a reference here to the node. -->
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>
-    
+
     <method name="getXMLDesc" desc="Return an XML description of the storage pool.">
       <arg name="description" dir="O" type="sstr" desc="XML description of the storage pool."/>
     </method>
-    
+
     <method name="create" desc="Starts an inactive storage pool.">
     </method>
-    
+
     <method name="destroy" desc="Destroy an active storage pool. This will deactivate the pool on the host, but keep any persistent config associated with it. If it has a persistent config it can later be restarted with a create() call">
     </method>
 
     <method name="delete" desc="Destroy the pool and delete its definition">
     </method>
-    
+
     <method name="createVolumeXML" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
 
       <arg name="xmlDesc" type="sstr" desc="XML Description of the volume to create"/>
-      
+
       <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
     </method>
   </class>
- 
+
   <class name="Volume">
     <property name="key" type="sstr" access="RC" desc="Storage volume key"/>
     <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
@@ -145,7 +144,7 @@
     <property name="capacity" type="uint64" desc="Capacity of storage volume in bytes"/>
     <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
 
-    <property name="storagePool" type="objId" references="Pool" access="RC" index="y" parentRef="y" 
+    <property name="storagePool" type="objId" references="Pool" access="RC" index="y" parentRef="y"
      desc="Pool where this storage volume exists"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the volume.">

@@ -6,7 +6,6 @@
 
 #include "ArgsPoolCreateVolumeXML.h"
 #include "ArgsPoolGetXMLDesc.h"
-//#include "ArgsVolumeGetXmlDesc.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -51,7 +50,7 @@ PoolWrap::syncVolumes()
     virStoragePoolInfo info;
 
     cout << "Syncing volumes.\n";
-    
+
     ret = virStoragePoolGetInfo(pool_ptr, &info);
     if (ret < 0) {
         REPORT_ERR(conn, "PoolWrap: Unable to get info of storage pool");
@@ -223,7 +222,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             virStorageVolPtr volume_ptr;
 
             volume_ptr = virStorageVolCreateXML(pool_ptr, io_args->i_xmlDesc.c_str(), 0);
-            if (volume_ptr == NULL) { 
+            if (volume_ptr == NULL) {
                 errstr = FORMAT_ERR(conn, "Error creating new storage volume from XML description (virStorageVolCreateXML).");
                 return STATUS_USER;
             }
