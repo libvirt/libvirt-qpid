@@ -1,0 +1,69 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="">
+  <title>Libvirt-qpid: Qpid interface to libvirt.</title>
+</head>
+
+<body bgcolor="#ffffff">
+<h1 align="center">Libvirt-qpid: Qpid interface to libvirt.</h1>
+
+<h1>Note: this is the flat content of the <a href="index.html">web site</a></h1>
+
+<h1 style="text-align: center">libvirt-qpid</h1>
+
+<h3>What is <span class="style1">libvirt-qpid?</span></h3>
+
+    <p>
+libvirt-qpid provides an interface with libvirt using QMF (qpid modeling
+framework) which utilizes the AMQP protocol.  The Advanced Message Queuing
+Protocol (AMQP) is an open standard application layer protocol providing
+reliable transport of messages.
+    </p>
+    <p>
+QMF provides a modeling framework layer on top of qpid (which implements 
+AMQP).  This interface allows you to manage hosts, domains, pools etc. as
+a set of objects with properties and methods.
+    </p>
+
+<h2><a name="releases">Releases</a></h2>
+
+<p>There are no official releases at this time.  To check out the latest
+source, use git:
+</p>
+
+<pre>
+  $ git clone git://git.et.redhat.com/libvirt-qpid
+</pre>
+
+<h2><a name="architecture">Architecture</a></h2>
+
+<p>
+  libvirt-qpid is an agent that runs on a given host.  It will connect
+  to both the local libvirtd and to a qpid broker.  It then queries
+  libvirtd every 5 seconds and maintains objects of various classes
+  that reflect the activity and configuration of libvirtd.
+</p>
+<p>
+  The classes include the node (the host), domains, storage pools, 
+  and storage volumes.  A complete synchronization takes place each
+  iteration so that any state changes that happen outside of the
+  channel provided by libvirt-qpid will be reflected in the objects
+  representing the state.
+</p>
+<p>
+  In addition the libvirt API is implemented for each class and calls
+  can be made on any of the objects usin the basic libvirt API (with
+  some small differences).
+</p>
+<p>
+  Qpid and QMF then provide reliable messaging of calls (they will queue
+  up), pushing of changes to libvirt status, and a centralized view of
+  a potentially large array of systems (nodes) running libvirt.  All this
+  with a fairly intuitive API.  Note also that searching for specific objects
+  can be done through the QMF console API and negates the need for the lookup
+  functions in the libvirt API.
+</p>
+      
+</body>
+
+</html>
