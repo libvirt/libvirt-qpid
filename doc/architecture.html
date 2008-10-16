@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /><link rel="stylesheet" type="text/css" href="http://libvirt.org/qpid/main.css" /><link rel="SHORTCUT ICON" href="/32favicon.png" /><title>Architecture</title><meta name="description" content="libvirt, virtualization, virtualization API, qpid" /></head><body><div id="header"><div id="headerLogo"></div><div id="headerSearch"><form action="search.php" enctype="application/x-www-form-urlencoded" method="get"><div><input id="query" name="query" type="text" size="12" value="" /><input id="submit" name="submit" type="submit" value="Search" /></div></form></div></div><div id="body"><div id="menu"><ul class="l0"><li><div><a href="index.html" class="inactive">Home</a></div></li><li><a href="http://libvirt.org/" class="inactive">libvirt</a></li><li><div><a href="releases.html" class="inactive">Releases</a></div></li><li><div><a href="architecture.html" class="inactive">Architecture</a></div></li><li><a href="https://www.redhat.com/mailman/listinfo/libvir-list" class="inactive">Mailing list</a></li></ul></div><div id="content"><h1 class="style1">Architecture</h1><p>
+  libvirt-qpid is an agent that runs on a given host.  It will connect
+  to both the local libvirtd and to a qpid broker.  It then queries
+  libvirtd every 5 seconds and maintains objects of various classes
+  that reflect the activity and configuration of libvirtd.
+</p><p>
+  The classes include the node (the host), domains, storage pools, 
+  and storage volumes.  A complete synchronization takes place each
+  iteration so that any state changes that happen outside of the
+  channel provided by libvirt-qpid will be reflected in the objects
+  representing the state.
+</p><p>
+  In addition the libvirt API is implemented for each class and calls
+  can be made on any of the objects usin the basic libvirt API (with
+  some small differences).
+</p><p>
+  Qpid and QMF then provide reliable messaging of calls (they will queue
+  up), pushing of changes to libvirt status, and a centralized view of
+  a potentially large array of systems (nodes) running libvirt.  All this
+  with a fairly intuitive API.  Note also that searching for specific objects
+  can be done through the QMF console API and negates the need for the lookup
+  functions in the libvirt API.
+</p></div></div><div id="footer"></div></body></html>
