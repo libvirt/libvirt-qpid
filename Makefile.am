@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src
+SUBDIRS = src doc
 
 rpm: clean
 	@(unset CDPATH ; $(MAKE) dist && cp $(distdir).tar.gz \

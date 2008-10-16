@@ -1,8 +1,8 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 AutoReq: no
-Version: 0.1.3
-Release: 5
+Version: 0.2.0
+Release: 1
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -74,6 +74,13 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Wed Oct 15 2008 Ian Main <imain@redhat.com - 0.2.0
+- API changed to camel case.  
+- Return libvirt error codes.
+- Reconnect on libvirt disconnect.
+- Implement node info.
+- New release.
 
 * Wed Oct 1 2008 Ian Main <imain@redhat.com - 0.1.3
 - Bugfixes, memory leaks fixed etc.
