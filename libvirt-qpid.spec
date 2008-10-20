@@ -1,8 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-AutoReq: no
 Version: 0.2.0
-Release: 1
+Release: 2
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -16,8 +15,7 @@ Requires(preun): /sbin/service
 BuildRequires: qpidc-devel >= 0.3.696027
 BuildRequires: libvirt-devel >= 0.4.4
 BuildRequires: qmf-devel >= 0.3.696027
-#BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-#Url: http://libvirt.org/html/libvirt-qpid
+Url: http://libvirt.org/qpid
 
 %description
 
@@ -35,7 +33,7 @@ a set of objects with properties and methods.
 
 %build
 %configure
-make
+make 
 
 %install
 rm -rf %{buildroot}
@@ -61,9 +59,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %files
 
-%dir %{_datadir}/libvirt-qpid/
 %defattr(644,root,root)
-/usr/share/libvirt-qpid/libvirt-schema.xml
+%dir %{_datadir}/libvirt-qpid/
+%{_datadir}/libvirt-qpid/libvirt-schema.xml
 
 %defattr(755,root,root)
 %{_sbindir}/libvirt-qpid
