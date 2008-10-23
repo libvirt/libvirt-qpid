@@ -217,7 +217,7 @@
       <div id="footer">
         <p id="sponsor">
           Sponsored by:<br/>
-          IBM
+          Red Hat
         </p>
       </div>
     </body>
