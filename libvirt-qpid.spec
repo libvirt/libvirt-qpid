@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.0
-Release: 2
+Release: 3
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -15,6 +15,7 @@ Requires(preun): /sbin/service
 BuildRequires: qpidc-devel >= 0.3.696027
 BuildRequires: libvirt-devel >= 0.4.4
 BuildRequires: qmf-devel >= 0.3.696027
+ExclusiveArch: i386 x86_64
 Url: http://libvirt.org/qpid
 
 %description
