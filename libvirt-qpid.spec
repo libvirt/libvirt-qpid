@@ -15,7 +15,7 @@ Requires(preun): /sbin/service
 BuildRequires: qpidc-devel >= 0.3.696027
 BuildRequires: libvirt-devel >= 0.4.4
 BuildRequires: qmf-devel >= 0.3.696027
-ExclusiveArch: i386 x86_64
+ExclusiveArch: %{ix86} x86_64
 Url: http://libvirt.org/qpid
 
 %description
