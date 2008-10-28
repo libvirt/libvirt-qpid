@@ -181,7 +181,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             _qmf::ArgsPoolGetXMLDesc *ioArgs = (_qmf::ArgsPoolGetXMLDesc *) &args;
             char *desc;
 
-            desc = virStoragePoolGetXMLDesc(pool_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
+            desc = virStoragePoolGetXMLDesc(pool_ptr, 0);
             if (desc) {
                 ioArgs->o_description = desc;
             } else {
