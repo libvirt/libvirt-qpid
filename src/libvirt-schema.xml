@@ -25,21 +25,21 @@
     <property name="threads" type="uint32" access="RC" desc="Number of threads per core"/>
 
     <method name="domainDefineXML" desc="Define a new domain, but does not start it.">
-      <arg name="xmlDesc" dir="I" type="sstr" desc="XML domain description"/>
+      <arg name="xmlDesc" dir="I" type="lstr" desc="XML domain description"/>
 
       <arg name="domain" dir="O" type="objId" desc="Newly created domain object"/>
     </method>
 
     <method name="storagePoolDefineXML"
      desc="Define a new inactive storage pool based on its XML description. The pool is persistent, until explicitly undefined.">
-      <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
+      <arg name="xmlDesc" type="lstr" desc="XML Description of the storage pool"/>
 
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
 
     <method name="storagePoolCreateXML"
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
-      <arg name="xmlDesc" type="sstr" desc="XML Description of the storage pool"/>
+      <arg name="xmlDesc" type="lstr" desc="XML Description of the storage pool"/>
 
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
@@ -84,7 +84,7 @@
     <method name="reboot" desc="Reboot VM"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the domain.">
-      <arg name="description" dir="O" type="sstr" desc="XML description of the domain."/>
+      <arg name="description" dir="O" type="lstr" desc="XML description of the domain."/>
     </method>
 
 
@@ -113,7 +113,7 @@
     <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the storage pool.">
-      <arg name="description" dir="O" type="sstr" desc="XML description of the storage pool."/>
+      <arg name="description" dir="O" type="lstr" desc="XML description of the storage pool."/>
     </method>
 
     <method name="create" desc="Starts an inactive storage pool.">
@@ -127,7 +127,7 @@
 
     <method name="createVolumeXML" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
 
-      <arg name="xmlDesc" type="sstr" desc="XML Description of the volume to create"/>
+      <arg name="xmlDesc" type="lstr" desc="XML Description of the volume to create"/>
 
       <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
     </method>
@@ -145,7 +145,7 @@
      desc="Pool where this storage volume exists"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the volume.">
-      <arg name="description" dir="O" type="sstr" desc="XML description of the volume."/>
+      <arg name="description" dir="O" type="lstr" desc="XML description of the volume."/>
     </method>
   </class>
 

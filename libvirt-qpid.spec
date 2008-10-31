@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.0
-Release: 3
+Version: 0.2.1
+Release: 0
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -74,25 +74,30 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %changelog
 
-* Wed Oct 15 2008 Ian Main <imain@redhat.com - 0.2.0
+* Thu Oct 30 2008 Ian Main <imain@redhat.com> - 0.2.1
+- Use lstr for xml descriptions.  This lets you have greater than 
+  255 characters in the string.
+- Fix bug in calling of getXMLDesc.
+
+* Wed Oct 15 2008 Ian Main <imain@redhat.com> - 0.2.0
 - API changed to camel case.  
 - Return libvirt error codes.
 - Reconnect on libvirt disconnect.
 - Implement node info.
 - New release.
 
-* Wed Oct 1 2008 Ian Main <imain@redhat.com - 0.1.3
+* Wed Oct 1 2008 Ian Main <imain@redhat.com> - 0.1.3
 - Bugfixes, memory leaks fixed etc.
 
-* Tue Sep 30 2008 Ian Main <imain@redhat.com - 0.1.2
+* Tue Sep 30 2008 Ian Main <imain@redhat.com> - 0.1.2
 - Updated spec to remove qpidd requirement.
 - Added libvirt-qpid sysconfig file.
 
-* Fri Sep 26 2008 Ian Main <imain@redhat.com - 0.1.2
+* Fri Sep 26 2008 Ian Main <imain@redhat.com> - 0.1.2
 - Setup daemonization and init scripts.
 - Added getopt for command line parsing.
 
-* Fri Sep 19 2008 Ian Main <imain@redhat.com - 0.1.1
+* Fri Sep 19 2008 Ian Main <imain@redhat.com> - 0.1.1
 - Initial packaging.
 
 
