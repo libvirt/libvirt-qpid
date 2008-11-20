@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.1
-Release: 1
+Version: 0.2.2
+Release: 0
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
@@ -73,6 +73,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Wed Nov 20 2008 Ian Main <imain@redhat.com> - 0.2.2
+- Change update interval to 3 seconds, update version.
 
 * Wed Nov 19 2008 Ian Main <imain@redhat.com> - 0.2.2
 - Rebase to newer qpid.

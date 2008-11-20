@@ -358,8 +358,8 @@ void NodeWrap::doLoop()
         FD_ZERO(&fds);
         FD_SET(read_fd, &fds);
 
-        /* Wait up to five seconds. */
-        tv.tv_sec = 5;
+        /* Wait up to three seconds. */
+        tv.tv_sec = 3;
         tv.tv_usec = 0;
 
         retval = select(read_fd + 1, &fds, NULL, NULL, &tv);
@@ -527,7 +527,7 @@ int main(int argc, char** argv) {
     // updates to stats/properties to the broker.  The last is set to 'true'
     // to keep this all single threaded.  Otherwise a second thread would be
     // used to implement methods.
-    agent->init(string(host ? host : "127.0.0.1"), port, 5, true);
+    agent->init(string(host ? host : "127.0.0.1"), port, 3, true);
 
     while(true) {
         try {
