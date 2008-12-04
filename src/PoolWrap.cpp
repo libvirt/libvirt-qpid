@@ -201,6 +201,16 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
 
+        case _qmf::Pool::METHOD_BUILD:
+        {
+            ret = virStoragePoolBuild(pool_ptr, 0);
+            if (ret < 0) {
+                errstr = FORMAT_ERR(conn, "Error building storage pool (virStoragePoolBuild).", &ret);
+                return STATUS_USER + ret;
+            }
+            return STATUS_OK;
+        }
+
         case _qmf::Pool::METHOD_DESTROY:
         {
             ret = virStoragePoolDestroy(pool_ptr);

@@ -1,20 +1,20 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.2
+Version: 0.2.3
 Release: 0
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
 Group: Applications/System
-Requires: qmf >= 0.3.696027
-Requires: qpidc >= 0.3.696027
+Requires: qmf >= 0.3.722557
+Requires: qpidc >= 0.3.722557
 Requires: libvirt >= 0.4.4
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
-BuildRequires: qpidc-devel >= 0.3.696027
-BuildRequires: libvirt-devel >= 0.4.4
-BuildRequires: qmf-devel >= 0.3.696027
+BuildRequires: qpidc-devel >= 0.3.722557
+BuildRequires: libvirt-devel >= 0.5.0
+BuildRequires: qmf-devel >= 0.3.722557
 ExclusiveArch: %{ix86} x86_64
 Url: http://libvirt.org/qpid
 
@@ -73,6 +73,10 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Thu Dec 4 2008 Ian Main <imain@redhat.com> - 0.2.3
+- Added 'build' method to storage pool.
+- Build against newer libvirt and qpid.
 
 * Wed Nov 20 2008 Ian Main <imain@redhat.com> - 0.2.2
 - Change update interval to 3 seconds, update version.

@@ -119,6 +119,9 @@
     <method name="create" desc="Starts an inactive storage pool.">
     </method>
 
+    <method name="build" desc="Build the underlying storage pool.">
+    </method>
+
     <method name="destroy" desc="Destroy an active storage pool. This will deactivate the pool on the host, but keep any persistent config associated with it. If it has a persistent config it can later be restarted with a create() call">
     </method>
 
