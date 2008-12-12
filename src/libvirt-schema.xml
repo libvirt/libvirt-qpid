@@ -37,6 +37,15 @@
       <arg name="pool" dir="O" type="objId" desc="Newly created storage pool"/>
     </method>
 
+    <method name="findStoragePoolSources"
+     desc="Talks to a storage backend and attempts to auto-discover the set of available storage pool sources.">
+      <arg name="type" type="lstr" desc="Type of storage pool sources to discover."/>
+      <arg name="srcSpec" type="lstr" desc="XML document specifying discovery source"/>
+
+      <arg name="xmlDesc" dir="O" type="lstr"
+       desc="XML document consisting of a SourceList element containing a source document appropriate to the given pool type for each discovered source."/>
+    </method>
+
     <method name="storagePoolCreateXML"
      desc="Create a new storage based on its XML description. The pool is not persistent, so its definition will disappear when it is destroyed, or if the host is restarted">
       <arg name="xmlDesc" type="lstr" desc="XML Description of the storage pool"/>

@@ -15,6 +15,7 @@
 #include "ArgsNodeDomainDefineXML.h"
 #include "ArgsNodeStoragePoolCreateXML.h"
 #include "ArgsNodeStoragePoolDefineXML.h"
+#include "ArgsNodeFindStoragePoolSources.h"
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
@@ -429,6 +430,23 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
             io_args->o_pool = pool->GetManagementObject()->getObjectId();
+
+            return STATUS_OK;
+        }
+        case _qmf::Node::METHOD_FINDSTORAGEPOOLSOURCES:
+        {
+            _qmf::ArgsNodeFindStoragePoolSources *io_args = (_qmf::ArgsNodeFindStoragePoolSources *) &args;
+            virStoragePoolPtr pool_ptr;
+            char *xml_result;
+
+            xml_result = virConnectFindStoragePoolSources(conn, io_args->i_type.c_str(), io_args->i_srcSpec.c_str(), 0);
+            if (xml_result == NULL) {
+                errstr = FORMAT_ERR(conn, "Error creating storage pool using xml description (virStoragePoolCreateXML).", &ret);
+                return STATUS_USER + ret;
+            }
+
+            io_args->o_xmlDesc = xml_result;
+            free(xml_result);
 
             return STATUS_OK;
         }
