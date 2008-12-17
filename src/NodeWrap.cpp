@@ -104,7 +104,7 @@ NodeWrap::~NodeWrap()
 {
     /* Go through our list of pools and destroy them all! MOOOHAHAHA */
     for (std::vector<PoolWrap*>::iterator iter = pools.begin(); iter != pools.end();) {
-        delete (*iter);
+        delete(*iter);
         iter = pools.erase(iter);
     }
 
@@ -314,7 +314,7 @@ void NodeWrap::syncPools()
         virStoragePoolPtr ptr = virStoragePoolLookupByUUIDString(conn, (*iter)->pool_uuid.c_str());
         if (ptr == NULL) {
             printf("Destroying pool %s\n", (*iter)->pool_name.c_str());
-            delete (*iter);
+            delete(*iter);
             iter = pools.erase(iter);
         } else {
             virStoragePoolFree(ptr);
@@ -395,6 +395,7 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_USER + ret;
             } else {
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
+                domains.push_back(domain);
                 io_args->o_domain = domain->GetManagementObject()->getObjectId();
                 return STATUS_OK;
             }
@@ -412,7 +413,7 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
-
+            pools.push_back(pool);
             io_args->o_pool = pool->GetManagementObject()->getObjectId();
             return STATUS_OK;
 
@@ -429,6 +430,7 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
 
             PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
+            pools.push_back(pool);
             io_args->o_pool = pool->GetManagementObject()->getObjectId();
 
             return STATUS_OK;
@@ -436,7 +438,6 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
         case _qmf::Node::METHOD_FINDSTORAGEPOOLSOURCES:
         {
             _qmf::ArgsNodeFindStoragePoolSources *io_args = (_qmf::ArgsNodeFindStoragePoolSources *) &args;
-            virStoragePoolPtr pool_ptr;
             char *xml_result;
 
             xml_result = virConnectFindStoragePoolSources(conn, io_args->i_type.c_str(), io_args->i_srcSpec.c_str(), 0);

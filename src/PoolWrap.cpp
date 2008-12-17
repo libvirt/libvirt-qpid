@@ -33,6 +33,10 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
 
     pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name);
     agent->addObject(pool);
+
+    // Call update() here so we set the state and see if there are any volumes
+    // before returning the new object.
+    update();
 }
 
 PoolWrap::~PoolWrap()
@@ -121,7 +125,7 @@ PoolWrap::syncVolumes()
         virStorageVolPtr ptr = virStorageVolLookupByName(pool_ptr, (*iter)->volume_name.c_str());
         if (ptr == NULL) {
             printf("Destroying volume %s\n", (*iter)->volume_name.c_str());
-            delete (*iter);
+            delete(*iter);
             iter = volumes.erase(iter);
         } else {
             virStorageVolFree(ptr);
@@ -140,6 +144,8 @@ PoolWrap::update()
 {
     virStoragePoolInfo info;
     int ret;
+
+    syncVolumes();
 
     ret = virStoragePoolGetInfo(pool_ptr, &info);
     if (ret < 0) {
@@ -166,7 +172,6 @@ PoolWrap::update()
     pool->set_allocation(info.allocation);
     pool->set_available(info.available);
 
-    syncVolumes();
 }
 
 Manageable::status_t
@@ -198,6 +203,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 errstr = FORMAT_ERR(conn, "Error creating new storage pool (virStoragePoolCreate).", &ret);
                 return STATUS_USER + ret;
             }
+            update();
             return STATUS_OK;
         }
 
@@ -208,6 +214,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 errstr = FORMAT_ERR(conn, "Error building storage pool (virStoragePoolBuild).", &ret);
                 return STATUS_USER + ret;
             }
+            update();
             return STATUS_OK;
         }
 
@@ -218,6 +225,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 errstr = FORMAT_ERR(conn, "Error destroying storage pool (virStoragePoolDestroy).", &ret);
                 return STATUS_USER + ret;
             }
+            update();
             return STATUS_OK;
         }
 
@@ -228,6 +236,18 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 errstr = FORMAT_ERR(conn, "Error deleting storage pool (virStoragePoolDelete).", &ret);
                 return STATUS_USER + ret;
             }
+            update();
+            return STATUS_OK;
+        }
+
+        case _qmf::Pool::METHOD_UNDEFINE:
+        {
+            ret = virStoragePoolUndefine(pool_ptr);
+            if (ret < 0) {
+                errstr = FORMAT_ERR(conn, "Error undefining storage pool (virStoragePoolUndefine).", &ret);
+                return STATUS_USER + ret;
+            }
+            update();
             return STATUS_OK;
         }
 
@@ -244,8 +264,10 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
 
             VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);
+            volumes.push_back(volume);
             io_args->o_volume = volume->GetManagementObject()->getObjectId();
 
+            update();
             return STATUS_OK;
         }
     }

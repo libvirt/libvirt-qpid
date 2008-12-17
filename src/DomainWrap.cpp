@@ -155,9 +155,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Domain::METHOD_SAVE:
             {
-                _qmf::ArgsDomainSave *ioArgs = (_qmf::ArgsDomainSave *) &args;
+                _qmf::ArgsDomainSave *io_args = (_qmf::ArgsDomainSave *) &args;
 
-                ret = virDomainSave(domain_ptr, ioArgs->i_filename.c_str());
+                ret = virDomainSave(domain_ptr, io_args->i_filename.c_str());
                 if (ret < 0) {
                     errstr = FORMAT_ERR(conn, "Error saving domain (virDomainSave).", &ret);
                     return STATUS_USER + ret;
@@ -167,9 +167,9 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Domain::METHOD_RESTORE:
             {
-                _qmf::ArgsDomainRestore *ioArgs = (_qmf::ArgsDomainRestore *) &args;
+                _qmf::ArgsDomainRestore *io_args = (_qmf::ArgsDomainRestore *) &args;
 
-                ret = virDomainRestore(conn, ioArgs->i_filename.c_str());
+                ret = virDomainRestore(conn, io_args->i_filename.c_str());
                 update();
                 if (ret < 0) {
                     errstr = FORMAT_ERR(conn, "Error restoring domain (virDomainRestore).", &ret);
@@ -198,11 +198,11 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Domain::METHOD_GETXMLDESC:
             {
-                _qmf::ArgsDomainGetXMLDesc *ioArgs = (_qmf::ArgsDomainGetXMLDesc *) &args;
+                _qmf::ArgsDomainGetXMLDesc *io_args = (_qmf::ArgsDomainGetXMLDesc *) &args;
                 char *desc;
                 desc = virDomainGetXMLDesc(domain_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
                 if (desc) {
-                    ioArgs->o_description = desc;
+                    io_args->o_description = desc;
                 } else {
                     errstr = FORMAT_ERR(conn, "Error getting XML description of domain(virDomainGetXMLDesc).", &ret);
                     return STATUS_USER + ret;
@@ -212,10 +212,30 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Domain::METHOD_MIGRATE:
             {
-                //_qmf::ArgsDomainMigrate *ioArgs = (_qmf::ArgsDomainMigrate *) &args;
+                virConnectPtr dest_conn;
+                virDomainPtr rem_dom;
+                _qmf::ArgsDomainMigrate *io_args = (_qmf::ArgsDomainMigrate *) &args;
 
-                // ret = virDomainMigrate(domain_ptr, ioArgs->i_filename.c_str());
-                return STATUS_NOT_IMPLEMENTED;
+                dest_conn = virConnectOpen(io_args->i_destinationUri.c_str());
+                if (!dest_conn) {
+                    errstr = FORMAT_ERR(dest_conn, "Unable to connect to remote system for migration: virConnectOpen", &ret);
+                    return STATUS_USER + ret;
+                }
+
+                rem_dom = virDomainMigrate(domain_ptr, dest_conn, io_args->i_flags,
+                                           io_args->i_newDomainName.c_str(),
+                                           io_args->i_uri.c_str(),
+                                           io_args->i_bandwidth);
+
+                virConnectClose(dest_conn);
+
+                if (!rem_dom) {
+                    errstr = FORMAT_ERR(conn, "virDomainMigrate", &ret);
+                    return STATUS_USER + ret;
+                }
+                virDomainFree(rem_dom);
+
+                return STATUS_OK;
             }
     }
 

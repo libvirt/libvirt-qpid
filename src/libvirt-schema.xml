@@ -97,14 +97,15 @@
     </method>
 
 
+    <!-- It'd be nice to be able to pass in destination node object and return the domain but
+         that involves handling those objects on the agent which I'm not sure how to do at this
+         time. -->
     <method name="migrate" desc="Migrate this VM to another host">
-      <arg name="destination_node" dir="I" type="objId" desc="Object representing destination host."/>
+      <arg name="destinationUri" dir="I" type="sstr" desc="Destination host connection uri."/>
       <arg name="flags" dir="I" type="uint32" desc="Flags for migration, see documentation for details."/>
       <arg name="newDomainName" dir="I" type="sstr" desc="New domain name on new host if applicable."/>
       <arg name="uri" dir="I" type="sstr" desc="Destination hostname/URI as seen from host."/>
       <arg name="bandwidth" dir="I" type="uint32" desc="Maximum bandwidth to consume in Mbps."/>
-
-      <arg name="domain" dir="O" type="objId" desc="New VM object on new host"/>
     </method>
   </class>
 
@@ -135,6 +136,9 @@
     </method>
 
     <method name="delete" desc="Destroy the pool and delete its definition">
+    </method>
+
+    <method name="undefine" desc="Undefine an inactive storage pool.">
     </method>
 
     <method name="createVolumeXML" desc="Create a storage volume within a pool based on an XML description.  Not all pool types support volume creation.">
