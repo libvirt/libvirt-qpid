@@ -81,7 +81,7 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             _qmf::ArgsVolumeGetXMLDesc *io_args = (_qmf::ArgsVolumeGetXMLDesc *) &args;
             char *desc;
 
-            desc = virStorageVolGetXMLDesc(volume_ptr, VIR_DOMAIN_XML_SECURE | VIR_DOMAIN_XML_INACTIVE);
+            desc = virStorageVolGetXMLDesc(volume_ptr, 0);
             if (desc) {
                 io_args->o_description = desc;
             } else {
