@@ -163,6 +163,8 @@
     <method name="getXMLDesc" desc="Return an XML description of the volume.">
       <arg name="description" dir="O" type="lstr" desc="XML description of the volume."/>
     </method>
+    <method name="delete" desc="Delete the storage volume from the pool.">
+    </method>
   </class>
 
 </schema>

@@ -216,6 +216,8 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 virDomainPtr rem_dom;
                 _qmf::ArgsDomainMigrate *io_args = (_qmf::ArgsDomainMigrate *) &args;
 
+                // This is actually quite broken.  Most setups won't allow unauthorized connection
+                // from one node to another directly like this.
                 dest_conn = virConnectOpen(io_args->i_destinationUri.c_str());
                 if (!dest_conn) {
                     errstr = FORMAT_ERR(dest_conn, "Unable to connect to remote system for migration: virConnectOpen", &ret);

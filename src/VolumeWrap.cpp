@@ -90,6 +90,16 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             }
             return STATUS_OK;
         }
+    case _qmf::Volume::METHOD_DELETE:
+        {
+            ret = virStorageVolDelete(volume_ptr, 0);
+            if (ret < 0) {
+                errstr = FORMAT_ERR(conn, "Error deleting storage volume (virStorageVolDelete).", &ret);
+                return STATUS_USER + ret;
+            }
+            update();
+            return STATUS_OK;
+        }
     }
 
     return STATUS_NOT_IMPLEMENTED;

@@ -390,13 +390,29 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             _qmf::ArgsNodeDomainDefineXML *io_args = (_qmf::ArgsNodeDomainDefineXML *) &args;
             domain_ptr = virDomainDefineXML(conn, io_args->i_xmlDesc.c_str());
             if (!domain_ptr) {
-                //REPORT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).");
                 errstr = FORMAT_ERR(conn, "Error creating domain using xml description (virDomainDefineXML).", &ret);
                 return STATUS_USER + ret;
             } else {
+                // Now we have to check to see if this domain is actually new or not, because it's possible that
+                // one already exists with this name/description and we just replaced it.. *ugh*
+                for (std::vector<DomainWrap*>::iterator iter = domains.begin(); iter != domains.end();) {
+                    if (strcmp((*iter)->domain_name.c_str(), virDomainGetName(domain_ptr)) == 0) {
+                        // We're just replacing an existing domain, however I'm pretty sure the
+                        // old domain pointer becomes invalid at this point, so we should destroy
+                        // the old domain reference.  The other option would be to replace it and
+                        // keep the object valid.. not sure which is better.
+                        printf("Old domain already exists, removing it in favor of new object.");
+                        delete(*iter);
+                        iter = domains.erase(iter);
+                    } else {
+                        iter++;
+                    }
+                }
+
                 DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
                 domains.push_back(domain);
                 io_args->o_domain = domain->GetManagementObject()->getObjectId();
+
                 return STATUS_OK;
             }
         }
