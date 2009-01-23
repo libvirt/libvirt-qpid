@@ -2,6 +2,7 @@
 #include <qpid/management/Manageable.h>
 #include <qpid/management/ManagementObject.h>
 #include <qpid/agent/ManagementAgent.h>
+#include <qpid/client/ConnectionSettings.h>
 #include <qpid/sys/Mutex.h>
 
 #include "Package.h"
@@ -20,12 +21,12 @@
 
 using namespace qpid::management;
 using namespace qpid::sys;
+using namespace qpid::client;
 using namespace std;
 using qpid::management::ManagementObject;
 using qpid::management::Manageable;
 using qpid::management::Args;
 using qpid::sys::Mutex;
-
 
 // Forward decl of DomainWrap to get around cyclic reference.
 class DomainWrap;

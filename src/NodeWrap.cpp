@@ -475,10 +475,13 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 static void
 print_usage()
 {
-    printf("Usage:\tlibvirt-qpid [--daemon|--help|--server <hostname>|--port <port>]\n");
+    printf("Usage:\tlibvirt-qpid <options>\n");
     printf("\t-d | --daemon     run as a daemon.\n");
     printf("\t-h | --help       print this help message.\n");
-    printf("\t-s | --broker     specify broker host name..\n");
+    printf("\t-b | --broker     specify broker host name..\n");
+    printf("\t-g | --gssapi     force GSSAPI authentication.\n");
+    printf("\t-u | --username   username to use for authentication purproses.\n");
+    printf("\t-s | --service    service name to use for authentication purproses.\n");
     printf("\t-p | --port       specify broker port.\n");
 }
 
@@ -491,18 +494,24 @@ int main(int argc, char** argv) {
     int idx = 0;
     bool verbose = false;
     bool daemonize = false;
+    bool gssapi = false;
+    char *host = NULL;
+    char *username = NULL;
+    char *service = NULL;
+    int port = 5672;
+
     struct option opt[] = {
         {"help", 0, 0, 'h'},
         {"daemon", 0, 0, 'd'},
         {"broker", 1, 0, 'b'},
+        {"gssapi", 0, 0, 'g'},
+        {"username", 1, 0, 'u'},
+        {"service", 1, 0, 's'},
         {"port", 1, 0, 'p'},
-        {"verbose", 0, 0, 'v'},
         {0, 0, 0, 0}
     };
-    char *host = NULL;
-    int port = 5672;
 
-    while ((arg = getopt_long(argc, argv, "hdb:p:", opt, &idx)) != -1) {
+    while ((arg = getopt_long(argc, argv, "hdb:gu:s:p:", opt, &idx)) != -1) {
         switch (arg) {
             case 'h':
             case '?':
@@ -514,6 +523,25 @@ int main(int argc, char** argv) {
                 break;
             case 'v':
                 verbose = true;
+                break;
+            case 's':
+                if (optarg) {
+                    service = strdup(optarg);
+                } else {
+                    print_usage();
+                    exit(1);
+                }
+                break;
+            case 'u':
+                if (optarg) {
+                    username = strdup(optarg);
+                } else {
+                    print_usage();
+                    exit(1);
+                }
+                break;
+            case 'g':
+                gssapi = true;
                 break;
             case 'p':
                 if (optarg) {
@@ -562,7 +590,22 @@ int main(int argc, char** argv) {
     // updates to stats/properties to the broker.  The last is set to 'true'
     // to keep this all single threaded.  Otherwise a second thread would be
     // used to implement methods.
-    agent->init(string(host ? host : "127.0.0.1"), port, 3, true);
+
+    ConnectionSettings settings;
+    settings.host = host ? host : "127.0.0.1";
+    settings.port = port;
+
+    if (username != NULL) {
+        settings.username = username;
+    }
+    if (service != NULL) {
+        settings.service = service;
+    }
+    if (gssapi == true) {
+        settings.mechanism = "GSSAPI";
+    }
+
+    agent->init(settings, 3, true);
 
     while(true) {
         try {
