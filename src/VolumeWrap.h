@@ -34,8 +34,13 @@ class VolumeWrap : public Manageable
     std::string volume_key;
     std::string volume_path;
 
+    std::string lvm_name;
+    bool has_lvm_child;
+
     virConnectPtr conn;
     virStorageVolPtr volume_ptr;
+
+    void checkForLVMPool();
 
 public:
 

@@ -1,3 +1,6 @@
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 #include <string.h>
 #include <sys/select.h>
 #include <errno.h>
@@ -11,7 +14,7 @@
 
 namespace _qmf = qmf::com::redhat::libvirt;
 
-VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent, 
+VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
                        virStorageVolPtr _volume_ptr, virConnectPtr _conn) :
                        conn(_conn), volume_ptr(_volume_ptr)
 {
@@ -40,10 +43,85 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
     }
     volume_name = volume_name_s;
 
-    volume = new _qmf::Volume(agent, this, parent, volume_key, volume_path, volume_name);
+    lvm_name = "";
+    has_lvm_child = false;
+
+    checkForLVMPool();
+
+    volume = new _qmf::Volume(agent, this, parent, volume_key, volume_path, volume_name, lvm_name);
     printf("adding volume to agent - volume %p\n", volume);
     agent->addObject(volume);
     printf("done\n");
+}
+
+void
+VolumeWrap::checkForLVMPool()
+{
+    char *xml;
+    char *real_path = NULL;
+
+    xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
+
+    if (xml) {
+        xmlDocPtr doc;
+        xmlNodePtr cur;
+
+        doc = xmlParseMemory(xml, strlen(xml));
+
+        if (doc == NULL ) {
+            return;
+        }
+
+        cur = xmlDocGetRootElement(doc);
+
+        if (cur == NULL) {
+            xmlFreeDoc(doc);
+            return;
+        }
+
+        xmlChar *path = NULL;
+        xmlChar *name = NULL;
+
+        cur = cur->xmlChildrenNode;
+        while (cur != NULL) {
+            xmlNodePtr source;
+            if ((!xmlStrcmp(cur->name, (const xmlChar *) "source"))) {
+                source = cur->xmlChildrenNode;
+                while (source != NULL) {
+                    if ((!xmlStrcmp(source->name, (const xmlChar *) "device"))) {
+                        path = xmlGetProp(source, (const xmlChar *) "path");
+                    }
+
+                    if ((!xmlStrcmp(source->name, (const xmlChar *) "name"))) {
+                        name = xmlNodeListGetString(doc, source->xmlChildrenNode, 1);
+                    }
+
+                source = source->next;
+                }
+                if (name && path) {
+                    virStorageVolPtr vol;
+
+                    printf ("xml returned device name %s, path %s; volume path is %s\n", name, path, volume_path.c_str());
+                    vol = virStorageVolLookupByPath(conn, (char *) path);
+                    if (vol != NULL) {
+                        real_path = virStorageVolGetPath(vol);
+                        if (real_path && strcmp(real_path, volume_path.c_str()) == 0) {
+                            printf ("found matching storage volume associated with pool!\n");
+                            lvm_name.assign((char *) name);
+                            has_lvm_child = true;
+                        }
+                    }
+                    xmlFree(path);
+                    xmlFree(name);
+                    path = NULL;
+                    name = NULL;
+                }
+            }
+            cur = cur->next;
+        }
+        free(xml);
+        xmlFreeDoc(doc);
+    }
 }
 
 void
@@ -101,6 +179,7 @@ VolumeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
             return STATUS_OK;
         }
     }
+
 
     return STATUS_NOT_IMPLEMENTED;
 }

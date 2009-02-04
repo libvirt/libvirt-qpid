@@ -112,6 +112,7 @@
   <class name="Pool">
     <property name="uuid" access="RC" type="sstr" desc="Pool UUID"/>
     <property name="name" access="RC" type="sstr" desc="Pool name"/>
+    <property name="parentVolume" access="RC" type="sstr" desc="If this pool is an LVM pool, this will contain the parent volume path."/>
 
     <property name="state" type="sstr" desc="Pool state"/>
     <property name="capacity" type="uint64" desc="Pool size in bytes"/>
@@ -153,6 +154,7 @@
     <property name="key" type="sstr" access="RC" desc="Storage volume key"/>
     <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
     <property name="name" type="sstr" access="RC" desc="Storage volume name"/>
+    <property name="childLVMName" type="sstr" access="RC" desc="The name of the LVM pool associated with this volume, or blank of non-existant."/>
 
     <property name="capacity" type="uint64" desc="Capacity of storage volume in bytes"/>
     <property name="allocation" type="uint64" desc="Current allocation in bytes"/>

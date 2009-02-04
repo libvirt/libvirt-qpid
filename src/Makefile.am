@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt
+INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt $(XML_CPPFLAGS)
 
 sbin_PROGRAMS = libvirt-qpid
 
@@ -46,7 +46,7 @@ $(generated_file_list): libvirt-schema.xml
 BUILT_SOURCES = $(generated_file_list)
 CLEANFILES = $(generated_file_list)
 
-libvirt_qpid_LDADD = -lqpidclient -lqpidcommon -lqmfagent -lvirt
+libvirt_qpid_LDADD = -lqpidclient -lqpidcommon -lqmfagent -lvirt $(XML_LIBS)
 
 dist_pkgdata_DATA = libvirt-schema.xml
 

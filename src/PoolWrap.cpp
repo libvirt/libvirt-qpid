@@ -1,4 +1,7 @@
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 #include "NodeWrap.h"
 #include "PoolWrap.h"
 #include "VolumeWrap.h"
@@ -16,6 +19,8 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
     int ret;
     char pool_uuid_str[VIR_UUID_STRING_BUFLEN];
     const char *pool_name_str;
+    char *xml;
+    char *parent_volume = NULL;
 
     ret = virStoragePoolGetUUIDString(pool_ptr, pool_uuid_str);
     if (ret < 0) {
@@ -28,10 +33,74 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
         REPORT_ERR(conn, "PoolWrap: error getting pool name\n");
     }
 
+    xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
+
+    if (xml) {
+        xmlDocPtr doc;
+        xmlNodePtr cur;
+
+        doc = xmlParseMemory(xml, strlen(xml));
+
+        if (doc == NULL ) {
+            goto done;
+        }
+
+        cur = xmlDocGetRootElement(doc);
+
+        if (cur == NULL) {
+            xmlFreeDoc(doc);
+            goto done;
+        }
+
+        xmlChar *path = NULL;
+        xmlChar *name = NULL;
+
+        cur = cur->xmlChildrenNode;
+        while (cur != NULL) {
+            xmlNodePtr source;
+            if ((!xmlStrcmp(cur->name, (const xmlChar *) "source"))) {
+                source = cur->xmlChildrenNode;
+                while (source != NULL) {
+                    if ((!xmlStrcmp(source->name, (const xmlChar *) "device"))) {
+                        path = xmlGetProp(source, (const xmlChar *) "path");
+                    }
+
+                    if ((!xmlStrcmp(source->name, (const xmlChar *) "name"))) {
+                        name = xmlNodeListGetString(doc, source->xmlChildrenNode, 1);
+                    }
+
+                source = source->next;
+                }
+                if (name && path) {
+                    if (strcmp(pool_name_str, (char *) name) == 0) {
+                        virStorageVolPtr vol;
+                        vol = virStorageVolLookupByPath(conn, (char *) path);
+                        if (vol != NULL) {
+                            printf ("found storage volume associated with pool!\n");
+                            parent_volume = virStorageVolGetPath(vol);
+                            printf ("xml returned device name %s, path %s; volume path is %s\n", name, path, parent_volume);
+                        }
+                    }
+                    xmlFree(path);
+                    xmlFree(name);
+                    path = NULL;
+                    name = NULL;
+                }
+            }
+            cur = cur->next;
+        }
+        free(xml);
+        xmlFreeDoc(doc);
+    }
+
+done:
+
+    pool_name_str = virStoragePoolGetName(pool_ptr);
+
     pool_name = pool_name_str;
     pool_uuid = pool_uuid_str;
 
-    pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name);
+    pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name, parent_volume ? parent_volume : "");
     agent->addObject(pool);
 
     // Call update() here so we set the state and see if there are any volumes
