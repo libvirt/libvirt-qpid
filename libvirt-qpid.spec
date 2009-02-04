@@ -1,11 +1,12 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.10
+Version: 0.2.12
 Release: 0
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPL
 Group: Applications/System
+Requires: libxml2 >= 2.7.1
 Requires: qmf >= 0.3.722557
 Requires: qpidc >= 0.3.722557
 Requires: libvirt >= 0.4.4
@@ -13,6 +14,7 @@ Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
 BuildRequires: qpidc-devel >= 0.3.722557
+BuildRequires: libxml2-devel >= 2.7.1
 BuildRequires: libvirt-devel >= 0.5.0
 BuildRequires: qmf-devel >= 0.3.722557
 ExclusiveArch: %{ix86} x86_64
@@ -73,6 +75,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Tue Feb 03 2009 Ian Main <imain@redhat.com> - 0.2.12
+- Added parentVolume to support LVM parent recognition.
 
 * Fri Jan 23 2009 Ian Main <imain@redhat.com> - 0.2.10
 - Added support for gssapi.

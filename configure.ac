@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(libvirt-qpid, 0.2.10)
+AC_INIT(libvirt-qpid, 0.2.12)
 AC_CONFIG_SRCDIR(src/NodeWrap.cpp)
 AC_PROG_CC
 AC_PROG_CXX
@@ -19,6 +19,10 @@ AC_SUBST([LIBVIRT_QPID_MICRO_VERSION])
 
 dnl Required minimum versions of all libs we depend on
 LIBVIRT_REQUIRED="4.4.0"
+
+dnl AM_PATH_XML2([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
+dnl Test for XML, and define XML_CPPFLAGS and XML_LIBS
+AM_PATH_XML2
 
 AC_OUTPUT(Makefile src/Makefile doc/Makefile)
 
