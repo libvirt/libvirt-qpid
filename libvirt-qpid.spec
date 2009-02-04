@@ -17,7 +17,6 @@ BuildRequires: qpidc-devel >= 0.3.722557
 BuildRequires: libxml2-devel >= 2.7.1
 BuildRequires: libvirt-devel >= 0.5.0
 BuildRequires: qmf-devel >= 0.3.722557
-ExclusiveArch: %{ix86} x86_64
 Url: http://libvirt.org/qpid
 
 %description
