@@ -1,22 +1,22 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.12
-Release: 0
+Release: 1
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-License: LGPL
+License: LGPLv2+
 Group: Applications/System
 Requires: libxml2 >= 2.7.1
-Requires: qmf >= 0.3.722557
-Requires: qpidc >= 0.3.722557
+Requires: qmf >= 0.4.738618-3
+Requires: qpidc >= 0.4.738618-3
 Requires: libvirt >= 0.4.4
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
-Requires(preun): /sbin/service
-BuildRequires: qpidc-devel >= 0.3.722557
+Requires(preun): initscripts
+BuildRequires: qpidc-devel >= 0.4.738618-3
 BuildRequires: libxml2-devel >= 2.7.1
 BuildRequires: libvirt-devel >= 0.5.0
-BuildRequires: qmf-devel >= 0.3.722557
+BuildRequires: qmf-devel >= 0.4.738618-3
 Url: http://libvirt.org/qpid
 
 %description
@@ -42,7 +42,7 @@ rm -rf %{buildroot}
 %makeinstall
 
 %post
-/sbin/chkconfig --add libvirt-qpid
+/sbin/chkconfig --add libvirt-qpid --level -
 /sbin/service libvirt-qpid condrestart
 
 %preun
@@ -61,63 +61,65 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %files
 
-%defattr(644,root,root)
+%defattr(-,root,root)
 %dir %{_datadir}/libvirt-qpid/
 %{_datadir}/libvirt-qpid/libvirt-schema.xml
 
-%defattr(755,root,root)
-%{_sbindir}/libvirt-qpid
+%attr(755, root, root) %{_sbindir}/libvirt-qpid
 %{_sysconfdir}/rc.d/init.d/libvirt-qpid
-%config(noreplace) %{_sysconfdir}/sysconfig/libvirt-qpid
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/sysconfig/libvirt-qpid
 
 %doc AUTHORS COPYING
 
 
 %changelog
 
-* Tue Feb 03 2009 Ian Main <imain@redhat.com> - 0.2.12
+* Wed Feb 25 2009 Ian Main <imain@redhat.com> - 0.2.12-1
+- Fixed various specfile issues.
+
+* Tue Feb 03 2009 Ian Main <imain@redhat.com> - 0.2.12-0
 - Added parentVolume to support LVM parent recognition.
 
-* Fri Jan 23 2009 Ian Main <imain@redhat.com> - 0.2.10
+* Fri Jan 23 2009 Ian Main <imain@redhat.com> - 0.2.10-0
 - Added support for gssapi.
 
-* Fri Dec 12 2008 Ian Main <imain@redhat.com> - 0.2.4
+* Fri Dec 12 2008 Ian Main <imain@redhat.com> - 0.2.4-0
 - Added 'findStoragePoolSources' method.
 
-* Thu Dec 4 2008 Ian Main <imain@redhat.com> - 0.2.3
+* Thu Dec 4 2008 Ian Main <imain@redhat.com> - 0.2.3-0
 - Added 'build' method to storage pool.
 - Build against newer libvirt and qpid.
 
-* Wed Nov 20 2008 Ian Main <imain@redhat.com> - 0.2.2
+* Wed Nov 20 2008 Ian Main <imain@redhat.com> - 0.2.2-0
 - Change update interval to 3 seconds, update version.
 
-* Wed Nov 19 2008 Ian Main <imain@redhat.com> - 0.2.2
+* Wed Nov 19 2008 Ian Main <imain@redhat.com> - 0.2.2-0
 - Rebase to newer qpid.
 
-* Thu Oct 30 2008 Ian Main <imain@redhat.com> - 0.2.1
+* Thu Oct 30 2008 Ian Main <imain@redhat.com> - 0.2.1-0
 - Use lstr for xml descriptions.  This lets you have greater than 
   255 characters in the string.
 - Fix bug in calling of getXMLDesc.
 
-* Wed Oct 15 2008 Ian Main <imain@redhat.com> - 0.2.0
+* Wed Oct 15 2008 Ian Main <imain@redhat.com> - 0.2.0-0
 - API changed to camel case.  
 - Return libvirt error codes.
 - Reconnect on libvirt disconnect.
 - Implement node info.
 - New release.
 
-* Wed Oct 1 2008 Ian Main <imain@redhat.com> - 0.1.3
+* Wed Oct 1 2008 Ian Main <imain@redhat.com> - 0.1.3-0
 - Bugfixes, memory leaks fixed etc.
 
-* Tue Sep 30 2008 Ian Main <imain@redhat.com> - 0.1.2
+* Tue Sep 30 2008 Ian Main <imain@redhat.com> - 0.1.2-0
 - Updated spec to remove qpidd requirement.
 - Added libvirt-qpid sysconfig file.
 
-* Fri Sep 26 2008 Ian Main <imain@redhat.com> - 0.1.2
+* Fri Sep 26 2008 Ian Main <imain@redhat.com> - 0.1.2-0
 - Setup daemonization and init scripts.
 - Added getopt for command line parsing.
 
-* Fri Sep 19 2008 Ian Main <imain@redhat.com> - 0.1.1
+* Fri Sep 19 2008 Ian Main <imain@redhat.com> - 0.1.1-0
 - Initial packaging.
 
 

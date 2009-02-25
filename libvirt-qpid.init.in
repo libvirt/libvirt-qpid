@@ -6,7 +6,6 @@
 ### BEGIN INIT INFO
 # Provides: libvirt-qpid
 # Should-Start: libvirtd
-# Default-Start: 3 4 5
 # Short-Description: gateway daemon to interact with libvirt viq qpid
 # Description: This is a daemon for interacting with libvirt viq qpid QMF.
 ### END INIT INFO
@@ -15,7 +14,7 @@
 #
 # libvirt-qpid:   gateway daemon to interact with libvirt viq qpid
 #
-# chkconfig: 345 98 03
+# chkconfig: - 98 03
 # description: This is a daemon for interacting with libvirt viq qpid QMF.
 #
 # processname: libvirt-qpid
