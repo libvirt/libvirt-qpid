@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.12
-Release: 1
+Release: 2
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -61,18 +61,21 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %files
 
-%defattr(-,root,root)
+%defattr(644, root, root, 755)
 %dir %{_datadir}/libvirt-qpid/
 %{_datadir}/libvirt-qpid/libvirt-schema.xml
 
 %attr(755, root, root) %{_sbindir}/libvirt-qpid
-%{_sysconfdir}/rc.d/init.d/libvirt-qpid
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/sysconfig/libvirt-qpid
+%attr(755, root, root) %{_sysconfdir}/rc.d/init.d/libvirt-qpid
+%config(noreplace) %{_sysconfdir}/sysconfig/libvirt-qpid
 
 %doc AUTHORS COPYING
 
 
 %changelog
+
+* Wed Feb 25 2009 Ian Main <imain@redhat.com> - 0.2.12-2
+- Fixed permissions in specfile.
 
 * Wed Feb 25 2009 Ian Main <imain@redhat.com> - 0.2.12-1
 - Fixed various specfile issues.
