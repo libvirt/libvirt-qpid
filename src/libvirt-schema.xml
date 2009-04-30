@@ -148,6 +148,10 @@
 
       <arg name="volume" dir="O" type="objId" desc="Newly created volume"/>
     </method>
+    
+    <method name="refresh" desc="Request that the pool refresh its list of volumes.">
+    </method>
+
   </class>
 
   <class name="Volume">

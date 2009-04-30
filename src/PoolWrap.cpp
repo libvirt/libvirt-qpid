@@ -106,6 +106,10 @@ done:
     pool = new _qmf::Pool(agent, this, parent, pool_uuid, pool_name, parent_volume ? parent_volume : "");
     agent->addObject(pool);
 
+    // Call refresh storage volumes in case anything changed in libvirt.
+    // I don't think we're too concerned if it fails?
+    virStoragePoolRefresh(pool_ptr, 0);
+
     // Call update() here so we set the state and see if there are any volumes
     // before returning the new object.
     update();
@@ -179,7 +183,7 @@ PoolWrap::syncVolumes()
                     REPORT_ERR(conn, "error looking up storage volume by name\n");
                     continue;
                 }
-                VolumeWrap *volume;
+                VolumeWrap *volume = NULL;
                 try {
                     VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
                     printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
@@ -187,7 +191,9 @@ PoolWrap::syncVolumes()
                 } catch (int i) {
                     printf ("Error constructing volume\n");
                     REPORT_ERR(conn, "constructing volume.");
-                    delete volume;
+                    if (volume) {
+                        delete volume;
+                    }
                 }
             }
         }
@@ -354,6 +360,17 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_USER + i;
             }
 
+            update();
+            return STATUS_OK;
+        }
+        
+        case _qmf::Pool::METHOD_REFRESH:
+        {
+            ret = virStoragePoolRefresh(pool_ptr, 0);
+            if (ret < 0) {
+                errstr = FORMAT_ERR(conn, "Error building storage pool (virStoragePoolBuild).", &ret);
+                return STATUS_USER + ret;
+            }
             update();
             return STATUS_OK;
         }
