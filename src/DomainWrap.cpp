@@ -16,10 +16,11 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent,
 {
     char dom_uuid[VIR_UUID_STRING_BUFLEN];
 
+    domain = NULL;
+
     if (virDomainGetUUIDString(domain_ptr, dom_uuid) < 0) {
         REPORT_ERR(conn, "DomainWrap: Unable to get UUID string of domain.");
-        // FIXME: Not sure how to handle this one..
-        return;
+        throw 1;
     }
 
     domain_uuid = dom_uuid;
@@ -27,7 +28,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent,
     const char *dom_name = virDomainGetName(domain_ptr);
     if (!dom_name) {
         REPORT_ERR(conn, "Unable to get domain name!\n");
-        return;
+        throw 1;
     }
 
     domain_name = dom_name;
@@ -38,7 +39,9 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent,
 
 DomainWrap::~DomainWrap()
 {
-    domain->resourceDestroy();
+    if (domain) {
+        domain->resourceDestroy();
+    }
     virDomainFree(domain_ptr);
 }
 

@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.12
-Release: 2
+Version: 0.2.13
+Release: 1%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,6 +73,13 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Thu Mar 26 2009 Ian Main <imain@redhat.com> - 0.2.13-1
+- Add throws to constructors in case one of the libvirt calls
+  fails.  Pretty sure this was the cause of some segfaults.
+
+* Thu Mar 26 2009 Ian Main <imain@redhat.com> - 0.2.12-3
+- Added dist to release version.
 
 * Wed Feb 25 2009 Ian Main <imain@redhat.com> - 0.2.12-2
 - Fixed permissions in specfile.

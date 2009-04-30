@@ -22,24 +22,26 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
     char *volume_path_s;
     const char *volume_name_s;
 
+    volume = NULL;
+
     volume_key_s = virStorageVolGetKey(volume_ptr);
     if (volume_key_s == NULL) {
         REPORT_ERR(conn, "Error getting storage volume key\n");
-        return;
+        throw 1;
     }
     volume_key = volume_key_s;
 
     volume_path_s = virStorageVolGetPath(volume_ptr);
     if (volume_path_s == NULL) {
         REPORT_ERR(conn, "Error getting volume path\n");
-        return;
+        throw 1;
     }
     volume_path = volume_path_s;
 
     volume_name_s = virStorageVolGetName(volume_ptr);
     if (volume_name_s == NULL) {
         REPORT_ERR(conn, "Error getting volume name\n");
-        return;
+        throw 1;
     }
     volume_name = volume_name_s;
 
@@ -51,6 +53,7 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
     volume = new _qmf::Volume(agent, this, parent, volume_key, volume_path, volume_name, lvm_name);
     printf("adding volume to agent - volume %p\n", volume);
     agent->addObject(volume);
+
     printf("done\n");
 }
 
@@ -143,7 +146,9 @@ VolumeWrap::update()
 
 VolumeWrap::~VolumeWrap()
 {
-    volume->resourceDestroy();
+    if (volume) {
+        volume->resourceDestroy();
+    }
     virStorageVolFree(volume_ptr);
 }
 

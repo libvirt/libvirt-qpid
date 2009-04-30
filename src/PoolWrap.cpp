@@ -22,15 +22,18 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
     char *xml;
     char *parent_volume = NULL;
 
+    pool = NULL;
+
     ret = virStoragePoolGetUUIDString(pool_ptr, pool_uuid_str);
     if (ret < 0) {
         REPORT_ERR(conn, "PoolWrap: Unable to get UUID\n");
-        return;
+        throw 1;
     }
 
     pool_name_str = virStoragePoolGetName(pool_ptr);
     if (pool_name_str == NULL) {
         REPORT_ERR(conn, "PoolWrap: error getting pool name\n");
+        throw 1;
     }
 
     xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
@@ -116,7 +119,9 @@ PoolWrap::~PoolWrap()
         iter = volumes.erase(iter);
     }
 
-    pool->resourceDestroy();
+    if (pool) {
+        pool->resourceDestroy();
+    }
     virStoragePoolFree(pool_ptr);
 }
 
@@ -174,10 +179,16 @@ PoolWrap::syncVolumes()
                     REPORT_ERR(conn, "error looking up storage volume by name\n");
                     continue;
                 }
-
-                VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
-                printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
-                volumes.push_back(volume);
+                VolumeWrap *volume;
+                try {
+                    VolumeWrap *volume = new VolumeWrap(agent, this, vol_ptr, conn);
+                    printf("Created new volume: %s, ptr is %p\n", volume_name, vol_ptr);
+                    volumes.push_back(volume);
+                } catch (int i) {
+                    printf ("Error constructing volume\n");
+                    REPORT_ERR(conn, "constructing volume.");
+                    delete volume;
+                }
             }
         }
 
@@ -332,9 +343,16 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_USER + ret;
             }
 
-            VolumeWrap *volume = new VolumeWrap(agent, this, volume_ptr, conn);
-            volumes.push_back(volume);
-            io_args->o_volume = volume->GetManagementObject()->getObjectId();
+            VolumeWrap *volume;
+            try {
+                volume = new VolumeWrap(agent, this, volume_ptr, conn);
+                volumes.push_back(volume);
+                io_args->o_volume = volume->GetManagementObject()->getObjectId();
+            } catch (int i) {
+                delete volume;
+                errstr = FORMAT_ERR(conn, "Error constructing pool object in virStorageVolCreateXML.", &ret);
+                return STATUS_USER + i;
+            }
 
             update();
             return STATUS_OK;

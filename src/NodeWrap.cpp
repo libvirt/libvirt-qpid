@@ -155,9 +155,16 @@ void NodeWrap::syncDomains()
             if (!domain_ptr) {
                 REPORT_ERR(conn, "virDomainLookupByName");
             } else {
-                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-                printf("Created new domain: %s, ptr is %p\n", dnames[i], domain_ptr);
-                domains.push_back(domain);
+                DomainWrap *domain;
+                try {
+                    domain = new DomainWrap(agent, this, domain_ptr, conn);
+                    printf("Created new domain: %s, ptr is %p\n", dnames[i], domain_ptr);
+                    domains.push_back(domain);
+                } catch (int i) {
+                    printf ("Error constructing domain\n");
+                    REPORT_ERR(conn, "constructing domain.");
+                    delete domain;
+                }
             }
         }
         for (int i = 0; i < maxname; i++) {
@@ -210,9 +217,16 @@ void NodeWrap::syncDomains()
                 continue;
             }
 
-            DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-            printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
-            domains.push_back(domain);
+            DomainWrap *domain;
+            try {
+                domain = new DomainWrap(agent, this, domain_ptr, conn);
+                printf("Created new domain: %d, ptr is %p\n", ids[i], domain_ptr);
+                domains.push_back(domain);
+            } catch (int i) {
+                printf ("Error constructing domain\n");
+                REPORT_ERR(conn, "constructing domain.");
+                delete domain;
+            }
         }
 
         free(ids);
@@ -256,9 +270,16 @@ void NodeWrap::checkPool(char *pool_name)
         REPORT_ERR(conn, "virStoragePoolLookupByName");
     } else {
         printf("Creating new pool: %s, ptr is %p\n", pool_name, pool_ptr);
-        PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
-        printf("Created new pool: %s, ptr is %p\n", pool_name, pool_ptr);
-        pools.push_back(pool);
+        PoolWrap *pool;
+        try {
+            pool = new PoolWrap(agent, this, pool_ptr, conn);
+            printf("Created new pool: %s, ptr is %p\n", pool_name, pool_ptr);
+            pools.push_back(pool);
+        } catch (int i) {
+            printf ("Error constructing pool\n");
+            REPORT_ERR(conn, "constructing pool.");
+            delete pool;
+        }
     }
 }
 
@@ -409,9 +430,16 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                     }
                 }
 
-                DomainWrap *domain = new DomainWrap(agent, this, domain_ptr, conn);
-                domains.push_back(domain);
-                io_args->o_domain = domain->GetManagementObject()->getObjectId();
+                DomainWrap *domain;
+                try {
+                    domain = new DomainWrap(agent, this, domain_ptr, conn);
+                    domains.push_back(domain);
+                    io_args->o_domain = domain->GetManagementObject()->getObjectId();
+                } catch (int i) {
+                    delete domain;
+                    errstr = FORMAT_ERR(conn, "Error constructing domain object in virDomainDefineXML.", &ret);
+                    return STATUS_USER + i;
+                }
 
                 return STATUS_OK;
             }
@@ -428,9 +456,16 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_USER + ret;
             }
 
-            PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
-            pools.push_back(pool);
-            io_args->o_pool = pool->GetManagementObject()->getObjectId();
+            PoolWrap *pool;
+            try {
+                pool = new PoolWrap(agent, this, pool_ptr, conn);
+                pools.push_back(pool);
+                io_args->o_pool = pool->GetManagementObject()->getObjectId();
+            } catch (int i) {
+                delete pool;
+                errstr = FORMAT_ERR(conn, "Error constructing pool object in virStoragePoolDefineXML.", &ret);
+                return STATUS_USER + i;
+            }
             return STATUS_OK;
 
         }
@@ -445,9 +480,16 @@ NodeWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                 return STATUS_USER + ret;
             }
 
-            PoolWrap *pool = new PoolWrap(agent, this, pool_ptr, conn);
-            pools.push_back(pool);
-            io_args->o_pool = pool->GetManagementObject()->getObjectId();
+            PoolWrap *pool;
+            try {
+                pool = new PoolWrap(agent, this, pool_ptr, conn);
+                pools.push_back(pool);
+                io_args->o_pool = pool->GetManagementObject()->getObjectId();
+            } catch (int i) {
+                delete pool;
+                errstr = FORMAT_ERR(conn, "Error constructing pool object in virStoragePoolCreateXML.", &ret);
+                return STATUS_USER + i;
+            }
 
             return STATUS_OK;
         }
