@@ -368,7 +368,7 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
         {
             ret = virStoragePoolRefresh(pool_ptr, 0);
             if (ret < 0) {
-                errstr = FORMAT_ERR(conn, "Error building storage pool (virStoragePoolBuild).", &ret);
+                errstr = FORMAT_ERR(conn, "Error refreshing storage pool (virStoragePoolRefresh).", &ret);
                 return STATUS_USER + ret;
             }
             update();
