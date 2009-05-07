@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.14
-Release: 0%{?dist}
+Release: 2%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,6 +73,12 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Thu May 07 2009 Ian Main <imain@redhat.com> - 0.2.14-2
+- Rebuild for new qpid.
+
+* Thu May 07 2009 Ian Main <imain@redhat.com> - 0.2.14-1
+- Rebuild for new qpid.
 
 * Thu Mar 26 2009 Ian Main <imain@redhat.com> - 0.2.14-0
 - Added refresh method to storage pools.
