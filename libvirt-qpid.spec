@@ -1,22 +1,22 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.14
-Release: 2%{?dist}
+Version: 0.2.15
+Release: 1%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
 Group: Applications/System
 Requires: libxml2 >= 2.7.1
-Requires: qmf >= 0.4.738618-3
-Requires: qpidc >= 0.4.738618-3
+Requires: qmf >= 0.5.752600-5
+Requires: qpidc >= 0.5.752600-5
 Requires: libvirt >= 0.4.4
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): initscripts
-BuildRequires: qpidc-devel >= 0.4.738618-3
+BuildRequires: qpidc-devel >= 0.5.752600-5
 BuildRequires: libxml2-devel >= 2.7.1
 BuildRequires: libvirt-devel >= 0.5.0
-BuildRequires: qmf-devel >= 0.4.738618-3
+BuildRequires: qmf-devel >= 0.5.752600-5
 Url: http://libvirt.org/qpid
 
 %description
@@ -35,7 +35,7 @@ a set of objects with properties and methods.
 
 %build
 %configure
-make 
+make
 
 %install
 rm -rf %{buildroot}
@@ -73,6 +73,15 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Thu May 28 2009 Ian Main <imain@redhat.com> - 0.2.15-1
+- Fix migration bug.
+
+* Thu May 07 2009 Ian Main <imain@redhat.com> - 0.2.14-4
+- Bump release for F11.
+
+* Thu May 07 2009 Ian Main <imain@redhat.com> - 0.2.14-3
+- Update requires for latest version of qpid.
 
 * Thu May 07 2009 Ian Main <imain@redhat.com> - 0.2.14-2
 - Rebuild for new qpid.
@@ -116,12 +125,12 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 - Rebase to newer qpid.
 
 * Thu Oct 30 2008 Ian Main <imain@redhat.com> - 0.2.1-0
-- Use lstr for xml descriptions.  This lets you have greater than 
+- Use lstr for xml descriptions.  This lets you have greater than
   255 characters in the string.
 - Fix bug in calling of getXMLDesc.
 
 * Wed Oct 15 2008 Ian Main <imain@redhat.com> - 0.2.0-0
-- API changed to camel case.  
+- API changed to camel case.
 - Return libvirt error codes.
 - Reconnect on libvirt disconnect.
 - Implement node info.

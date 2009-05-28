@@ -227,9 +227,25 @@ DomainWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
                     return STATUS_USER + ret;
                 }
 
+                const char *new_dom_name = NULL;
+                if (io_args->i_newDomainName.size() > 0) {
+                    new_dom_name = io_args->i_newDomainName.c_str();
+                }
+
+                const char *uri = NULL;
+                if (io_args->i_uri.size() > 0) {
+                    uri = io_args->i_uri.c_str();
+                }
+
+                printf ("calling migrate, new_dom_name: %s, uri: %s, flags: %d (live is %d)\n",
+                        new_dom_name ? new_dom_name : "NULL",
+                        uri ? uri : "NULL",
+                        io_args->i_flags,
+                        VIR_MIGRATE_LIVE);
+
                 rem_dom = virDomainMigrate(domain_ptr, dest_conn, io_args->i_flags,
-                                           io_args->i_newDomainName.c_str(),
-                                           io_args->i_uri.c_str(),
+                                           new_dom_name,
+                                           uri,
                                            io_args->i_bandwidth);
 
                 virConnectClose(dest_conn);
