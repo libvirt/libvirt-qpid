@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.15
-Release: 1%{?dist}
+Version: 0.2.16
+Release: 2%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,6 +73,17 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Fri Jun 05 2009 Ian Main <imain@redhat.com> - 0.2.16-2
+- Spec fixes.
+
+* Fri Jun 05 2009 Ian Main <imain@redhat.com> - 0.2.16-1
+- Cache calls to get storage XML as they take a LONG time.  This
+  greatly speeds up volume enumeration.
+
+* Thu May 28 2009 Ian Main <imain@redhat.com> - 0.2.16-1
+- Cache calls to get storage XML as they take a LONG time.  This
+  greatly speeds up volume enumeration.
 
 * Thu May 28 2009 Ian Main <imain@redhat.com> - 0.2.15-1
 - Fix migration bug.

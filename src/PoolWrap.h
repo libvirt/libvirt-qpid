@@ -36,6 +36,8 @@ class PoolWrap : public Manageable
 
     std::vector<VolumeWrap*> volumes;
 
+    char *pool_sources_xml;
+
 public:
 
     PoolWrap(ManagementAgent *agent, NodeWrap *parent, virStoragePoolPtr pool_ptr, virConnectPtr connect);
@@ -49,6 +51,7 @@ public:
         return pool;
     }
 
+    char * getPoolSourcesXml();
     void update();
     void syncVolumes();
 

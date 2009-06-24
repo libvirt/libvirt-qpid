@@ -40,6 +40,8 @@ class VolumeWrap : public Manageable
     virConnectPtr conn;
     virStorageVolPtr volume_ptr;
 
+    PoolWrap *wrap_parent;
+
     void checkForLVMPool();
 
 public:

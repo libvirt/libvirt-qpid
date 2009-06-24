@@ -19,7 +19,6 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
     int ret;
     char pool_uuid_str[VIR_UUID_STRING_BUFLEN];
     const char *pool_name_str;
-    char *xml;
     char *parent_volume = NULL;
 
     pool = NULL;
@@ -36,13 +35,13 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
         throw 1;
     }
 
-    xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
+    pool_sources_xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
 
-    if (xml) {
+    if (pool_sources_xml) {
         xmlDocPtr doc;
         xmlNodePtr cur;
 
-        doc = xmlParseMemory(xml, strlen(xml));
+        doc = xmlParseMemory(pool_sources_xml, strlen(pool_sources_xml));
 
         if (doc == NULL ) {
             goto done;
@@ -92,7 +91,6 @@ PoolWrap::PoolWrap(ManagementAgent *_agent, NodeWrap *parent,
             }
             cur = cur->next;
         }
-        free(xml);
         xmlFreeDoc(doc);
     }
 
@@ -127,6 +125,12 @@ PoolWrap::~PoolWrap()
         pool->resourceDestroy();
     }
     virStoragePoolFree(pool_ptr);
+}
+
+char *
+PoolWrap::getPoolSourcesXml()
+{
+    return pool_sources_xml;
 }
 
 void

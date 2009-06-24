@@ -24,6 +24,8 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
 
     volume = NULL;
 
+    wrap_parent = parent;
+
     volume_key_s = virStorageVolGetKey(volume_ptr);
     if (volume_key_s == NULL) {
         REPORT_ERR(conn, "Error getting storage volume key\n");
@@ -60,16 +62,16 @@ VolumeWrap::VolumeWrap(ManagementAgent *agent, PoolWrap *parent,
 void
 VolumeWrap::checkForLVMPool()
 {
-    char *xml;
     char *real_path = NULL;
+    char *pool_sources_xml;
 
-    xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
+    pool_sources_xml = wrap_parent->getPoolSourcesXml();
 
-    if (xml) {
+    if (pool_sources_xml) {
         xmlDocPtr doc;
         xmlNodePtr cur;
 
-        doc = xmlParseMemory(xml, strlen(xml));
+        doc = xmlParseMemory(pool_sources_xml, strlen(pool_sources_xml));
 
         if (doc == NULL ) {
             return;
@@ -122,7 +124,6 @@ VolumeWrap::checkForLVMPool()
             }
             cur = cur->next;
         }
-        free(xml);
         xmlFreeDoc(doc);
     }
 }
