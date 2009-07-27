@@ -108,6 +108,10 @@ done:
     // I don't think we're too concerned if it fails?
     virStoragePoolRefresh(pool_ptr, 0);
 
+    // Set storage pool state to an inactive. Should the state be different, the
+    // subsequent call to update will pick it up and fix it.
+    storagePoolState = VIR_STORAGE_POOL_INACTIVE;
+
     // Call update() here so we set the state and see if there are any volumes
     // before returning the new object.
     update();
@@ -235,8 +239,6 @@ PoolWrap::update()
     virStoragePoolInfo info;
     int ret;
 
-    syncVolumes();
-
     ret = virStoragePoolGetInfo(pool_ptr, &info);
     if (ret < 0) {
         REPORT_ERR(conn, "PoolWrap: Unable to get info of storage pool");
@@ -262,6 +264,16 @@ PoolWrap::update()
     pool->set_allocation(info.allocation);
     pool->set_available(info.available);
 
+    // Check if state has changed compared to stored state. If so, rescan
+    // storage pool sources (eg. logical pools on a lun might now be visible)
+    if (storagePoolState != info.state)
+        pool_sources_xml = virConnectFindStoragePoolSources(conn, "logical", NULL, 0);
+
+    storagePoolState = info.state;
+
+    // Sync volumes after (potentially) rescanning for logical storage pool sources
+    // so we pick up any new pools if the state of this pool changed.
+    syncVolumes();
 }
 
 Manageable::status_t

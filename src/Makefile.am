@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt $(XML_CPPFLAGS)
+INCLUDES = -I$(top_srcdir)/src/qmf/com/redhat/libvirt $(XML_CFLAGS)
 
 sbin_PROGRAMS = libvirt-qpid
 

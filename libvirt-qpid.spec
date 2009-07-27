@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.16
-Release: 5%{?dist}
+Version: 0.2.17
+Release: 0%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,6 +73,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Mon Jul 27 2009 Arjun Roy <arroy@redhat.com> -0.2.17.0
+- Fixed a bug related to updating of cached pool sources.
 
 * Fri Jun 05 2009 Ian Main <imain@redhat.com> - 0.2.16-5
 - Bump for new build.

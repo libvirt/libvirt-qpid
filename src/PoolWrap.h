@@ -37,6 +37,7 @@ class PoolWrap : public Manageable
     std::vector<VolumeWrap*> volumes;
 
     char *pool_sources_xml;
+    int storagePoolState;
 
 public:
 
