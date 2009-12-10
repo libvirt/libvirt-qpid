@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,6 +73,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Dec 10 2009 Ian Main <imain@redhat.com> - 0.2.17-3
+- Woops, don't need -lqmfengine.
+
 * Thu Nov 05 2009 Ian Main <imain@redhat.com> - 0.2.17-2
 - Fix libraries for new qpidc in src.
 
