@@ -1,19 +1,19 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
 Version: 0.2.17
-Release: 3%{?dist}
+Release: 4%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
 Group: Applications/System
 Requires: libxml2 >= 2.7.1
 Requires: qmf >= 0.5.790661
-Requires: qpidc >= 0.5.790661
+Requires: qpid-cpp-client >= 0.5.790661
 Requires: libvirt >= 0.4.4
 Requires(post):  /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): initscripts
-BuildRequires: qpidc-devel >= 0.5.790661
+BuildRequires: qpid-cpp-client-devel >= 0.5.790661
 BuildRequires: libxml2-devel >= 2.7.1
 BuildRequires: libvirt-devel >= 0.5.0
 BuildRequires: qmf-devel >= 0.5.790661
@@ -73,6 +73,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Feb 22 2010 Ian Main <imain@redhat.com> - 0.2.17-4
+- Update for changed qpid pkg names.
+
 * Thu Dec 10 2009 Ian Main <imain@redhat.com> - 0.2.17-3
 - Woops, don't need -lqmfengine.
 
