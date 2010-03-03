@@ -1,7 +1,7 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.17
-Release: 4%{?dist}
+Version: 0.2.18
+Release: 1%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 License: LGPLv2+
@@ -73,7 +73,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Feb 22 2010 Ian Main <imain@redhat.com> - 0.2.17-4
+* Mon Feb 22 2010 Ian Main <imain@redhat.com> - 0.2.18-1
 - Update for changed qpid pkg names.
 
 * Thu Dec 10 2009 Ian Main <imain@redhat.com> - 0.2.17-3

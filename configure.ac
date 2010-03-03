@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(libvirt-qpid, 0.2.17)
+AC_INIT(libvirt-qpid, 0.2.18)
 AC_CONFIG_SRCDIR(src/NodeWrap.cpp)
 AC_PROG_CC
 AC_PROG_CXX
