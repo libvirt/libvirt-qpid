@@ -1,6 +1,6 @@
 Summary: QPid QMF interface to Libvirt
 Name: libvirt-qpid
-Version: 0.2.18
+Version: 0.2.20
 Release: 1%{?dist}
 Source: libvirt-qpid-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -73,6 +73,12 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue May 26 Ian Main <imain@redhat.com> - 0.2.20-1
+- #include <string.h> in PoolWrap.cpp.
+
+* Tue May 25 Ian Main <imain@redhat.com> - 0.2.19-1
+- Update for changed QMF connection API.
+
 * Mon Feb 22 2010 Ian Main <imain@redhat.com> - 0.2.18-1
 - Update for changed qpid pkg names.
 

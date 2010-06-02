@@ -1,6 +1,7 @@
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <string.h>
 
 #include "NodeWrap.h"
 #include "PoolWrap.h"
@@ -355,7 +356,6 @@ PoolWrap::ManagementMethod(uint32_t methodId, Args& args, std::string &errstr)
 
         case _qmf::Pool::METHOD_CREATEVOLUMEXML:
         {
-            qpid::framing::Buffer buffer;
             _qmf::ArgsPoolCreateVolumeXML *io_args = (_qmf::ArgsPoolCreateVolumeXML *) &args;
             virStorageVolPtr volume_ptr;
 

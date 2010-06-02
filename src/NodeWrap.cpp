@@ -633,7 +633,7 @@ int main(int argc, char** argv) {
     // to keep this all single threaded.  Otherwise a second thread would be
     // used to implement methods.
 
-    ConnectionSettings settings;
+    qpid::management::ConnectionSettings settings;
     settings.host = host ? host : "127.0.0.1";
     settings.port = port;
 

@@ -21,7 +21,6 @@
 
 using namespace qpid::management;
 using namespace qpid::sys;
-using namespace qpid::client;
 using namespace std;
 using qpid::management::ManagementObject;
 using qpid::management::Manageable;
