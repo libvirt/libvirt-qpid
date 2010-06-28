@@ -8,7 +8,7 @@
   <!-- In libvirt this is really the 'Connect' class, I may end up changing it.. -->
 
   <class name="Node">
-    <property name="hostname" type="sstr" access="RC" desc="Host name"/>
+    <property name="hostname" type="sstr" access="RC" desc="Host name" index="y"/>
     <property name="uri" type="sstr" access="RC" desc="URI of libvirt"/>
     <property name="libvirtVersion" type="sstr" access="RC" desc="Version of libvirt on the managed node"/>
     <property name="apiVersion" type="sstr" access="RC" desc="Version of libvirt API on the managed node"/>
@@ -55,13 +55,13 @@
   </class>
 
   <class name="Domain">
-    <property name="uuid" access="RC" type="sstr" desc="Domain UUID"/>
-    <property name="name" access="RC" type="sstr" desc="Domain name"/>
+    <property name="uuid" access="RC" type="sstr" desc="Domain UUID" index="y"/>
+    <property name="name" access="RC" type="sstr" desc="Domain name" index="y"/>
     <property name="id" type="int64" desc="Hypervisor Domain id, -1 if not running."/>
 
     <!-- Set up an association of hosts to VMs.  This will setup a domain list in the node object
          and give us a reference here to the node object. -->
-    <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this VM"/>
+    <property name="node" type="objId" references="Node" access="RC" parentRef="y" desc="Node of this VM"/>
 
     <statistic name="maximumMemory" type="uint64" desc="Maximum memory allowed in KB."/>
     <statistic name="memory" type="uint64" desc="Memory used in KB."/>
@@ -110,8 +110,8 @@
   </class>
 
   <class name="Pool">
-    <property name="uuid" access="RC" type="sstr" desc="Pool UUID"/>
-    <property name="name" access="RC" type="sstr" desc="Pool name"/>
+    <property name="uuid" access="RC" type="sstr" desc="Pool UUID" index="y"/>
+    <property name="name" access="RC" type="sstr" desc="Pool name" index="y"/>
     <property name="parentVolume" access="RC" type="sstr" desc="If this pool is an LVM pool, this will contain the parent volume path."/>
 
     <property name="state" type="sstr" desc="Pool state"/>
@@ -121,7 +121,7 @@
 
     <!-- Set up an association of hosts to storage pools.  This will setup a list of pools in the node object
          and give us a reference here to the node. -->
-    <property name="node" type="objId" references="Node" access="RC" index="y" parentRef="y" desc="Node of this storage pool"/>
+    <property name="node" type="objId" references="Node" access="RC" parentRef="y" desc="Node of this storage pool"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the storage pool.">
       <arg name="description" dir="O" type="lstr" desc="XML description of the storage pool."/>
@@ -155,15 +155,15 @@
   </class>
 
   <class name="Volume">
-    <property name="key" type="sstr" access="RC" desc="Storage volume key"/>
-    <property name="path" type="sstr" access="RC" desc="Storage volume path"/>
-    <property name="name" type="sstr" access="RC" desc="Storage volume name"/>
+    <property name="key" type="sstr" access="RC" desc="Storage volume key" index="y"/>
+    <property name="path" type="sstr" access="RC" desc="Storage volume path" index="y"/>
+    <property name="name" type="sstr" access="RC" desc="Storage volume name" index="y"/>
     <property name="childLVMName" type="sstr" access="RC" desc="The name of the LVM pool associated with this volume, or blank of non-existant."/>
 
     <property name="capacity" type="uint64" desc="Capacity of storage volume in bytes"/>
     <property name="allocation" type="uint64" desc="Current allocation in bytes"/>
 
-    <property name="storagePool" type="objId" references="Pool" access="RC" index="y" parentRef="y"
+    <property name="storagePool" type="objId" references="Pool" access="RC" parentRef="y"
      desc="Pool where this storage volume exists"/>
 
     <method name="getXMLDesc" desc="Return an XML description of the volume.">

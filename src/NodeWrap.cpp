@@ -647,6 +647,7 @@ int main(int argc, char** argv) {
         settings.mechanism = "GSSAPI";
     }
 
+    agent->setName("Red Hat", "libvirt-qpid");
     agent->init(settings, 3, true);
 
     while(true) {

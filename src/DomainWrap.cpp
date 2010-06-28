@@ -34,6 +34,7 @@ DomainWrap::DomainWrap(ManagementAgent *agent, NodeWrap *parent,
     domain_name = dom_name;
 
     domain = new _qmf::Domain(agent, this, parent, domain_uuid, domain_name);
+    printf("Creating new domain object for %s\n", domain_name.c_str());
     agent->addObject(domain);
 }
 
