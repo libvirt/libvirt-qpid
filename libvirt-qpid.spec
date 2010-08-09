@@ -73,6 +73,12 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Jul 6 Ian Main <imain@redhat.com> - 0.2.22-1
+- Init script fixes.
+
+* Mon Jun 28 Ian Main <imain@redhat.com> - 0.2.21-1
+- Add indexes to various attributes so they are unique in qpidd etc.
+
 * Tue May 26 Ian Main <imain@redhat.com> - 0.2.20-1
 - #include <string.h> in PoolWrap.cpp.
 
