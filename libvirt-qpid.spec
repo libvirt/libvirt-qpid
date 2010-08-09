@@ -73,16 +73,16 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Jul 6 Ian Main <imain@redhat.com> - 0.2.22-1
+* Tue Jul 6 2010 Ian Main <imain@redhat.com> - 0.2.22-1
 - Init script fixes.
 
-* Mon Jun 28 Ian Main <imain@redhat.com> - 0.2.21-1
+* Mon Jun 28 2010 Ian Main <imain@redhat.com> - 0.2.21-1
 - Add indexes to various attributes so they are unique in qpidd etc.
 
-* Tue May 26 Ian Main <imain@redhat.com> - 0.2.20-1
+* Tue May 26 2010 Ian Main <imain@redhat.com> - 0.2.20-1
 - #include <string.h> in PoolWrap.cpp.
 
-* Tue May 25 Ian Main <imain@redhat.com> - 0.2.19-1
+* Tue May 25 2010 Ian Main <imain@redhat.com> - 0.2.19-1
 - Update for changed QMF connection API.
 
 * Mon Feb 22 2010 Ian Main <imain@redhat.com> - 0.2.18-1
