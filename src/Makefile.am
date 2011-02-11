@@ -38,13 +38,15 @@ libvirt_qpid_SOURCES = \
 	Error.h \
 	NodeWrap.h \
 	PoolWrap.h \
-	VolumeWrap.h 
+	VolumeWrap.h
 
-$(generated_file_list): libvirt-schema.xml
-	qmf-gen -o ./qmf ./libvirt-schema.xml
+$(generated_file_list): .libvirt-schema.xml.tstamp
+
+.libvirt-schema.xml.tstamp: libvirt-schema.xml
+	qmf-gen -o ./qmf $< && touch $@ || rm -f $@
 
 BUILT_SOURCES = $(generated_file_list)
-CLEANFILES = $(generated_file_list)
+CLEANFILES = $(generated_file_list) .libvirt-schema.xml.tstamp
 
 libvirt_qpid_LDADD = -lqmf -lqpidcommon -lqpidclient -lvirt $(XML_LIBS)
 
