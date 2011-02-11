@@ -1,4 +1,5 @@
 src/*.o
+libvirt-qpid.spec
 Makefile
 Makefile.in
 aclocal.m4

@@ -22,5 +22,10 @@ LIBVIRT_REQUIRED="4.4.0"
 
 PKG_CHECK_MODULES(XML, libxml-2.0)
 
-AC_OUTPUT(Makefile src/Makefile doc/Makefile)
+AC_OUTPUT(
+    Makefile
+    libvirt-qpid.spec
+    src/Makefile
+    doc/Makefile
+)
 

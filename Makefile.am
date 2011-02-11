@@ -2,6 +2,8 @@
 
 SUBDIRS = src doc
 
+EXTRA_DIST = libvirt-qpid.spec libvirt-qpid.spec.in
+
 rpm: clean
 	@(unset CDPATH ; $(MAKE) dist && cp $(distdir).tar.gz \
 	  $(HOME)/rpmbuild/SOURCES/ && rpmbuild -ba libvirt-qpid.spec)
