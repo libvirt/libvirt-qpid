@@ -48,7 +48,7 @@ $(generated_file_list): .libvirt-schema.xml.tstamp
 BUILT_SOURCES = $(generated_file_list)
 CLEANFILES = $(generated_file_list) .libvirt-schema.xml.tstamp
 
-libvirt_qpid_LDADD = -lqmf -lqpidcommon -lqpidclient -lvirt $(XML_LIBS)
+libvirt_qpid_LDADD = -lqmf -lqpidtypes -lqpidcommon -lqpidclient -lvirt $(XML_LIBS)
 
 dist_pkgdata_DATA = libvirt-schema.xml
 
