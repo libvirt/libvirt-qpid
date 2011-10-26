@@ -8,3 +8,6 @@ The libvirt-qpid project was initiated by:
 Patches have also been contributed by:
 
   Ted Ross              <tross@redhat.com>
+  Arjun Roy             <arroy@redhat.com>
+  Daniel P. Berrange    <berrange@redhat.com>
+  Eric Blake            <eblake@redhat.com>
